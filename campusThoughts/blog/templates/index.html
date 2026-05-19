@@ -1,0 +1,312 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+    
+    <!-- Feed Area (8 columns) -->
+    <div class="lg:col-span-8 flex flex-col gap-8">
+        
+        <!-- Category & Sorting Pills Navigation -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800/60">
+            <div class="flex flex-wrap gap-2">
+                <a href="{% url 'home' %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if not selected_category %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    All Thoughts
+                </a>
+                <a href="{% url 'home' %}?category=Programming{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Programming' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Programming
+                </a>
+                <a href="{% url 'home' %}?category=Lifestyle{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Lifestyle' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Lifestyle
+                </a>
+                <a href="{% url 'home' %}?category=Health{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Health' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Health
+                </a>
+                <a href="{% url 'home' %}?category=Family{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Family' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Family
+                </a>
+                <a href="{% url 'home' %}?category=Management{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Management' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Management
+                </a>
+                <a href="{% url 'home' %}?category=Travel{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Travel' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Travel
+                </a>
+                <a href="{% url 'home' %}?category=Work{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Work' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Work
+                </a>
+                <a href="{% url 'home' %}?category=Other{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Other' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                    Other
+                </a>
+            </div>
+
+            <!-- Sorting Buttons -->
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl self-start sm:self-auto">
+                <a href="?sort=newest{% if selected_category %}&category={{ selected_category }}{% endif %}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if not selected_sort or selected_sort == 'newest' %}bg-white dark:bg-slate-800 text-blue-600 shadow-sm{% else %}text-slate-500 dark:text-slate-400 hover:text-slate-800{% endif %}">
+                    Newest
+                </a>
+                <a href="?sort=popular{% if selected_category %}&category={{ selected_category }}{% endif %}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if selected_sort == 'popular' %}bg-white dark:bg-slate-800 text-blue-600 shadow-sm{% else %}text-slate-500 dark:text-slate-400 hover:text-slate-800{% endif %}">
+                    Popular
+                </a>
+                <a href="?sort=trending{% if selected_category %}&category={{ selected_category }}{% endif %}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if selected_sort == 'trending' %}bg-white dark:bg-slate-800 text-blue-600 shadow-sm{% else %}text-slate-500 dark:text-slate-400 hover:text-slate-800{% endif %}">
+                    Trending
+                </a>
+            </div>
+        </div>
+
+        <!-- Post Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {% for post in page_obj %}
+            <article class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 overflow-hidden flex flex-col h-full group">
+                
+                <!-- Card Header Banner -->
+                <div class="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-950">
+                    {% if post.photo %}
+                        <img src="{{ post.photo.url }}" alt="{{ post.text }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+                            <i class="fa-solid fa-graduation-cap text-5xl text-blue-600/35"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Category Badge -->
+                    <span class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 text-blue-600 dark:text-blue-400 text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-full backdrop-blur-md">
+                        {{ post.category }}
+                    </span>
+
+                    <!-- Quick Bookmark AJAX button -->
+                    <button class="bookmark-btn absolute top-4 right-4 w-9 h-9 bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-400 hover:text-yellow-500 rounded-full flex items-center justify-center backdrop-blur-md shadow-sm transition" data-id="{{ post.id }}">
+                        <i class="{% if user in post.bookmarks.all %}fa-solid fa-bookmark text-yellow-500{% else %}fa-regular fa-bookmark{% endif %} text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-6 sm:p-8 flex-grow flex flex-col justify-between">
+                    <div>
+                        <!-- Author Metadata -->
+                        <div class="flex items-center gap-3 mb-4">
+                            {% if post.user.profile.avatar %}
+                                <img src="{{ post.user.profile.avatar.url }}" alt="{{ post.user.username }}" class="w-7 h-7 rounded-full object-cover">
+                            {% else %}
+                                <div class="w-7 h-7 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
+                                    {{ post.user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            <div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                                <a href="{% url 'profile_detail' username=post.user.username %}" class="font-bold hover:text-blue-600 transition">
+                                    {{ post.user.username }}
+                                </a>
+                                <span>•</span>
+                                <span>{{ post.created_at }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Post Title -->
+                        <a href="{% url 'full_blog' slug=post.slug %}" class="block group-hover:text-blue-600 transition">
+                            <h3 class="text-lg sm:text-xl font-bold font-outfit text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
+                                {{ post.text }}
+                            </h3>
+                        </a>
+                        
+                        <!-- Snippet description -->
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 line-clamp-2">
+                            {{ post.description|striptags }}
+                        </p>
+                    </div>
+
+                    <!-- Footer Details -->
+                    <div class="flex items-center justify-between pt-6 mt-6 border-t border-slate-100 dark:border-slate-800/80">
+                        <div class="flex items-center gap-4 text-slate-400 dark:text-slate-500 text-xs">
+                            <!-- Live Likes Count -->
+                            <button class="like-btn flex items-center gap-1.5 hover:text-red-500 transition group/like" data-id="{{ post.id }}">
+                                <i class="{% if user in post.likes.all %}fa-solid fa-heart text-red-500 animate-pulse{% else %}fa-regular fa-heart{% endif %} text-sm"></i>
+                                <span class="count font-semibold">{{ post.likes.count }}</span>
+                            </button>
+                            <!-- Read Time -->
+                            <div class="flex items-center gap-1">
+                                <i class="fa-regular fa-clock"></i>
+                                <span>{{ post.read_time }}</span>
+                            </div>
+                            <!-- Views -->
+                            <div class="flex items-center gap-1">
+                                <i class="fa-regular fa-eye"></i>
+                                <span>{{ post.views_count }}</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'full_blog' slug=post.slug %}" class="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:gap-2 transition-all">
+                            Read More <i class="fa-solid fa-arrow-right-long"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="md:col-span-2 py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800/40">
+                <i class="fa-solid fa-feather-pointed text-5xl text-slate-300 dark:text-slate-700 mb-4 block"></i>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">No Campus Thoughts Yet</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Be the first to share an article, event, or note!</p>
+                <a href="{% url 'blog_create' %}" class="mt-4 inline-block bg-blue-600 text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/20">Write First Post</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <nav class="flex items-center justify-center gap-2 pt-8">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center text-slate-500 transition shadow-sm">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-blue-500/25">
+                        {{ num }}
+                    </span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center text-slate-600 dark:text-slate-400 text-sm font-semibold transition shadow-sm">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center text-slate-500 transition shadow-sm">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                </a>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar Widget Column (4 columns) -->
+    <aside class="lg:col-span-4 flex flex-col gap-8">
+        
+        <!-- Welcome Widget Card -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            <h3 class="text-xl sm:text-2xl font-extrabold font-outfit mb-3">🏫 Welcome to Campus Thoughts!</h3>
+            <p class="text-sm text-blue-100/90 leading-relaxed mb-6">
+                The modern decentralized knowledge center. Share assignments, tutorial reviews, programming hackathons, lifestyle vibes, and connect with peer academics.
+            </p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="w-full text-center bg-white text-blue-700 font-bold px-6 py-3 rounded-full hover:scale-[1.02] shadow-md transition block text-sm">
+                    Start Sharing Free
+                </a>
+            {% else %}
+                <a href="{% url 'blog_create' %}" class="w-full text-center bg-white text-blue-700 font-bold px-6 py-3 rounded-full hover:scale-[1.02] shadow-md transition block text-sm">
+                    Create New Post
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Trending Articles Panel -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 p-6 sm:p-8 shadow-sm">
+            <h3 class="text-lg font-bold font-outfit text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-orange-500 animate-bounce"></i> Trending Today
+            </h3>
+            <div class="flex flex-col gap-6">
+                {% for trend in trending_posts %}
+                <div class="flex gap-4 group">
+                    <span class="text-2xl font-extrabold text-slate-200 dark:text-slate-800 font-outfit group-hover:text-blue-500 transition duration-300">
+                        0{{ forloop.counter }}
+                    </span>
+                    <div class="flex flex-col gap-1">
+                        <a href="{% url 'full_blog' slug=trend.slug %}" class="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2 transition leading-snug">
+                            {{ trend.text }}
+                        </a>
+                        <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">
+                            {{ trend.category }}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm text-slate-500 text-center py-4">No trends found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- AJAX FETCH SCRIPT for Interactive Likes and Bookmarks -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Fetch CSRF Token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Like Button Handler
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                {% if not user.is_authenticated %}
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                {% endif %}
+                
+                const postId = btn.dataset.id;
+                try {
+                    const response = await fetch(`/profile/like-toggle/${postId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.liked) {
+                        btn.querySelector('i').className = "fa-solid fa-heart text-red-500 animate-pulse";
+                    } else {
+                        btn.querySelector('i').className = "fa-regular fa-heart";
+                    }
+                    btn.querySelector('.count').textContent = data.likes_count;
+                } catch (error) {
+                    console.error('Error toggling like:', error);
+                }
+            });
+        });
+
+        // Bookmark Button Handler
+        document.querySelectorAll('.bookmark-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                {% if not user.is_authenticated %}
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                {% endif %}
+
+                const postId = btn.dataset.id;
+                try {
+                    const response = await fetch(`/profile/bookmark-toggle/${postId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.bookmarked) {
+                        btn.querySelector('i').className = "fa-solid fa-bookmark text-yellow-500";
+                    } else {
+                        btn.querySelector('i').className = "fa-regular fa-bookmark";
+                    }
+                } catch (error) {
+                    console.error('Error toggling bookmark:', error);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

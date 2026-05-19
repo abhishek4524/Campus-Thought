@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}Get Started — Campus Thoughts{% endblock %}
+
+{% block swiper %}
+<!-- Disables slider for focused signup flow -->
+{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-xl p-8 sm:p-10 transition-colors flex flex-col gap-6">
+    <div class="text-center flex flex-col gap-2">
+        <h2 class="text-3xl font-extrabold font-outfit text-slate-900 dark:text-slate-100">
+            Create Your Account
+        </h2>
+        <p class="text-xs text-slate-400 dark:text-slate-500">
+            Sign up to share tutorials, programming hackathons, lifestyle blogs, and connect with academic peers.
+        </p>
+    </div>
+
+    <!-- Errors alert -->
+    {% if form.errors %}
+    <div class="p-4 bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 text-xs rounded-xl border border-red-100 dark:border-red-900/30">
+        <p class="font-bold mb-1">Please fix the following problems:</p>
+        <ul class="list-disc pl-4 space-y-1">
+            {% for field in form %}
+                {% if field.errors %}
+                    <li><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Form -->
+    <form method="POST" class="flex flex-col gap-4 font-sans">
+        {% csrf_token %}
+        
+        <!-- Username -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400">Username</label>
+            {{ form.username }}
+            <span class="text-[9px] text-slate-400">Can only contain alphanumeric characters and underscores.</span>
+        </div>
+
+        <!-- Email -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400">Campus Email</label>
+            {{ form.email }}
+            <span class="text-[9px] text-slate-400">Used for registration confirmations and reset links.</span>
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400">Password</label>
+            {{ form.password1 }}
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400">Confirm Password</label>
+            {{ form.password2 }}
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm shadow-md shadow-blue-500/10 transition mt-2">
+            Create Account & Join
+        </button>
+    </form>
+
+    <!-- Sign in redirect -->
+    <div class="text-center pt-4 border-t border-slate-100 dark:border-slate-850">
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+            Already have an active account? 
+            <a href="{% url 'login' %}" class="text-blue-600 font-bold hover:underline ml-1">Sign In</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

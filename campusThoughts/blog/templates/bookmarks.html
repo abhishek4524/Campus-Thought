@@ -1,0 +1,118 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto flex flex-col gap-8">
+    <div class="flex items-center gap-3 pb-6 border-b border-slate-200/60 dark:border-slate-800/60">
+        <i class="fa-solid fa-bookmark text-2xl text-yellow-500"></i>
+        <h2 class="text-2xl sm:text-3xl font-extrabold font-outfit text-slate-900 dark:text-slate-100">
+            Saved Thoughts & Bookmarks
+        </h2>
+    </div>
+
+    <!-- Bookmarks Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for post in page_obj %}
+        <article class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 overflow-hidden flex flex-col h-full group" id="bookmark-card-{{ post.id }}">
+            <div class="relative h-40 overflow-hidden bg-slate-100 dark:bg-slate-950">
+                {% if post.photo %}
+                    <img src="{{ post.photo.url }}" alt="{{ post.text }}" class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+                        <i class="fa-solid fa-graduation-cap text-4xl text-blue-600/30"></i>
+                    </div>
+                {% endif %}
+                
+                <span class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 text-blue-600 dark:text-blue-400 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full backdrop-blur-md">
+                    {{ post.category }}
+                </span>
+                
+                <!-- Remove Bookmark Button -->
+                <button class="remove-bookmark-btn absolute top-4 right-4 w-9 h-9 bg-white dark:bg-slate-900 text-red-500 hover:bg-red-50 rounded-full flex items-center justify-center shadow-sm transition" data-id="{{ post.id }}">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
+            </div>
+
+            <div class="p-6 flex-grow flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500 block mb-2">{{ post.created_at }}</span>
+                    <a href="{% url 'full_blog' slug=post.slug %}" class="block group-hover:text-blue-600 transition">
+                        <h4 class="text-base font-bold font-outfit text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
+                            {{ post.text }}
+                        </h4>
+                    </a>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">
+                        {{ post.description|striptags }}
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80">
+                    <div class="flex items-center gap-3 text-slate-400 dark:text-slate-500 text-[10px]">
+                        <span>❤️ {{ post.likes.count }}</span>
+                        <span>👁️ {{ post.views_count }}</span>
+                    </div>
+                    <a href="{% url 'full_blog' slug=post.slug %}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                        Read Thought
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800/40">
+            <i class="fa-regular fa-bookmark text-5xl text-slate-300 dark:text-slate-700 mb-4 block"></i>
+            <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">No Saved Thoughts</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Bookmark interesting stories from the home feed to read later!</p>
+            <a href="{% url 'home' %}" class="mt-4 inline-block bg-blue-600 text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/20">Browse Feeds</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- AJAX REMOVE BOOKMARK SCRIPTS -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Fetch CSRF Token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        document.querySelectorAll('.remove-bookmark-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const postId = btn.dataset.id;
+                try {
+                    const response = await fetch(`/profile/bookmark-toggle/${postId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (!data.bookmarked) {
+                        const card = document.getElementById(`bookmark-card-${postId}`);
+                        card.remove();
+                        // If no cards left, reload to show empty state
+                        if (document.querySelectorAll('[id^="bookmark-card-"]').length === 0) {
+                            window.location.reload();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error toggling bookmark:', error);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

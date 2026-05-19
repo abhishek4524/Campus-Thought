@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{% if post %}Edit: {{ post.text }}{% else %}Share Your Thoughts{% endif %} — Campus Thoughts
+{% endblock %}
+
+{% block swiper %}
+<!-- Disables top slider for focused blog writing -->
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm p-6 sm:p-10 transition-colors">
+    
+    <!-- Title header -->
+    <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100 dark:border-slate-800/80">
+        <i class="fa-solid fa-feather-pointed text-2xl text-blue-600"></i>
+        <h2 class="text-2xl font-extrabold font-outfit text-slate-900 dark:text-slate-100">
+            {% if form.instance.pk %}Edit Campus Thought{% else %}Write New Campus Thought{% endif %}
+        </h2>
+    </div>
+
+    <!-- Form -->
+    <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-6 font-sans">
+        {% csrf_token %}
+        
+        <!-- Error alert -->
+        {% if form.errors %}
+        <div class="p-4 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-2xl border border-red-100 dark:border-red-900/30 text-sm">
+            <h4 class="font-bold mb-1">Please correct the following errors:</h4>
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                {% if field.errors %}
+                    <p><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Blog Title -->
+        <div class="flex flex-col gap-2">
+            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Thought Title</label>
+            {{ form.text }}
+            <span class="text-[10px] text-slate-400 dark:text-slate-500">A clear, engaging headline. Maximum 150 characters.</span>
+        </div>
+
+        <!-- Category & Draft Flag Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="flex flex-col gap-2">
+                <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Post Category</label>
+                {{ form.category }}
+            </div>
+            
+            <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-850/50 self-end h-[50px] sm:h-[58px]">
+                {{ form.is_draft }}
+                <div class="flex flex-col">
+                    <label for="id_is_draft" class="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Save as Draft</label>
+                    <span class="text-[9px] text-slate-400 dark:text-slate-500">Drafts are hidden from public grids.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cover Image -->
+        <div class="flex flex-col gap-2">
+            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Cover Graphic / Photograph</label>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+                {{ form.photo }}
+            </div>
+            {% if form.instance.photo %}
+                <div class="mt-2 text-xs text-slate-500">
+                    Currently selected: <a href="{{ form.instance.photo.url }}" target="_blank" class="text-blue-600 hover:underline">{{ form.instance.photo.name }}</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Description Rich Editor -->
+        <div class="flex flex-col gap-2">
+            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Story Body & Editorial Description</label>
+            <div class="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white text-slate-800">
+                {{ form.description }}
+            </div>
+        </div>
+
+        <!-- SEO Metadata Dropdown / Accordion -->
+        <div class="border-t border-slate-100 dark:border-slate-800/80 pt-6 mt-4">
+            <details class="group">
+                <summary class="flex items-center justify-between text-sm font-bold text-slate-600 dark:text-slate-400 cursor-pointer hover:text-blue-600 transition outline-none">
+                    <span>🔍 Advanced SEO Configuration</span>
+                    <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
+                </summary>
+                
+                <div class="flex flex-col gap-4 mt-6 pl-4 border-l-2 border-slate-100 dark:border-slate-850">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-bold text-slate-500">SEO Custom Title</label>
+                        {{ form.seo_title }}
+                        <span class="text-[9px] text-slate-400">Best under 60 characters for search snippet previews.</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-bold text-slate-500">SEO Meta Description</label>
+                        {{ form.seo_description }}
+                        <span class="text-[9px] text-slate-400">Summarize the article in 150-160 characters for Google results.</span>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800/80 pt-6 mt-4">
+            <a href="{% url 'home' %}" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-full text-sm transition">
+                Cancel
+            </a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-full text-sm shadow-md shadow-blue-500/10 transition">
+                Save & Publish
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

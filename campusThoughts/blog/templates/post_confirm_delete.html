@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-xl p-8 sm:p-10 text-center transition-colors">
+    <div class="w-16 h-16 bg-red-50 text-red-500 border border-red-100 dark:bg-red-950/20 dark:border-red-900/40 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl animate-pulse">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    
+    <h2 class="text-2xl font-black font-outfit text-slate-900 dark:text-slate-100 mb-2">
+        Delete Thought?
+    </h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+        Are you sure you want to permanently delete <span class="font-bold text-slate-850 dark:text-slate-200">"{{ post.text }}"</span>? This action is irreversible.
+    </p>
+
+    <form method="POST" class="flex flex-col gap-3">
+        {% csrf_token %}
+        <button type="submit" class="w-full bg-red-500 hover:bg-red-650 text-white font-bold py-3 rounded-full text-sm shadow-md transition">
+            Yes, Delete Permanently
+        </button>
+        <a href="{% url 'full_blog' slug=post.slug %}" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-full text-sm transition">
+            Cancel & Keep Post
+        </a>
+    </form>
+</div>
+{% endblock %}

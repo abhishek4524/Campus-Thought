@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block title %}Verify Security Code — Campus Thoughts{% endblock %}
+
+{% block swiper %}
+<!-- Disables slider for recovery workspace -->
+{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-xl p-8 sm:p-10 transition-colors flex flex-col gap-6 relative overflow-hidden">
+    
+    <!-- Visual Gradient Accent -->
+    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+
+    <div class="text-center flex flex-col gap-2 mt-2">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-650 dark:text-blue-400 flex items-center justify-center mx-auto text-xl shadow-sm">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold font-outfit text-slate-900 dark:text-slate-100 mt-2">
+            Verify Code
+        </h2>
+        <p class="text-xs text-slate-450 dark:text-slate-500 max-w-xs mx-auto leading-relaxed">
+            We have sent a secure 6-digit verification code to <span class="font-bold text-slate-700 dark:text-slate-350">{{ email }}</span>.
+        </p>
+    </div>
+
+    <!-- Alert triggers -->
+    {% if messages %}
+    <div class="flex flex-col gap-2">
+        {% for message in messages %}
+        <div class="p-3.5 rounded-xl text-xs border {% if message.tags == 'error' %}bg-red-50 dark:bg-red-950/20 text-red-750 dark:text-red-400 border-red-100 dark:border-red-900/30{% else %}bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Form -->
+    <form method="POST" id="otp-form" class="flex flex-col gap-5 font-sans">
+        {% csrf_token %}
+        
+        <div class="flex flex-col gap-3">
+            <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-450 dark:text-slate-500 text-center">Enter 6-Digit Code</label>
+            {{ form.otp_code }}
+            {% if form.otp_code.errors %}
+            <span class="text-xs text-red-500 text-center font-bold">{{ form.otp_code.errors.0 }}</span>
+            {% endif %}
+            
+            <div class="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 px-1 mt-1">
+                <span>Code expires in <span class="font-bold text-blue-600">5 minutes</span></span>
+                <span>Max 3 attempts</span>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm shadow-md shadow-blue-500/10 hover:shadow-lg transition flex items-center justify-center gap-2">
+            <span id="btn-text">Verify & Continue</span>
+            <svg id="loading-spinner" class="animate-spin h-4.5 w-4.5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </button>
+    </form>
+
+    <!-- Resend logic -->
+    <div class="text-center pt-4 border-t border-slate-100 dark:border-slate-850/60 flex flex-col gap-2">
+        <p class="text-xs text-slate-400 dark:text-slate-500">
+            Didn't receive the email? 
+            <a href="{% url 'password_reset' %}" class="text-blue-600 font-bold hover:underline ml-1">Resend OTP</a>
+        </p>
+        <a href="{% url 'password_reset' %}" class="text-[10px] text-slate-400 hover:text-blue-600 hover:underline">
+            Request to use a different email
+        </a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('otp-form').addEventListener('submit', function() {
+        const btn = document.getElementById('submit-btn');
+        const text = document.getElementById('btn-text');
+        const spinner = document.getElementById('loading-spinner');
+        
+        btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-not-allowed');
+        text.textContent = 'Verifying security code...';
+        spinner.classList.remove('hidden');
+    });
+
+    // Auto capitalize or limit code input
+    const otpInput = document.querySelector('input[name="otp_code"]');
+    if (otpInput) {
+        otpInput.setAttribute('autocomplete', 'one-time-code');
+        otpInput.setAttribute('maxlength', '6');
+        otpInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    }
+</script>
+{% endblock %}

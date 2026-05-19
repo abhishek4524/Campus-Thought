@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block swiper %}
+<!-- Disables top slider for clean workspace -->
+{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm p-6 sm:p-10 transition-colors">
+    <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100 dark:border-slate-800/80">
+        <i class="fa-solid fa-gears text-2xl text-blue-600"></i>
+        <h2 class="text-2xl font-extrabold font-outfit text-slate-900 dark:text-slate-100">
+            Global Site Settings
+        </h2>
+    </div>
+
+    <form method="POST" class="flex flex-col gap-6 font-sans">
+        {% csrf_token %}
+        
+        <div class="flex flex-col gap-2">
+            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400">Site Title</label>
+            <input type="text" name="site_title" value="{{ site_config.site_title }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="e.g. Campus Thoughts">
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400">Footer Text</label>
+            <input type="text" name="footer_text" value="{{ site_config.footer_text }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="e.g. © 2026 Campus Thoughts. All rights reserved.">
+        </div>
+
+        <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-850/50">
+            <input type="checkbox" id="maintenance_mode" name="maintenance_mode" {% if site_config.maintenance_mode %}checked{% endif %} class="rounded border-slate-350 text-blue-600 focus:ring-blue-500 w-4 h-4">
+            <div class="flex flex-col">
+                <label for="maintenance_mode" class="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Activate Maintenance Lockout</label>
+                <span class="text-[9px] text-slate-400 dark:text-slate-500">Lock non-admin users out of front-facing feeds.</span>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800/80 pt-6 mt-4">
+            <a href="{% url 'admin_dashboard' %}" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-full text-xs transition">
+                Cancel
+            </a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-full text-xs shadow-md transition">
+                Save Variables
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

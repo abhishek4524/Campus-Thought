@@ -1,0 +1,236 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto flex flex-col gap-8 sm:gap-12">
+    
+    <!-- Profile Banner & Header Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm overflow-hidden transition-colors">
+        
+        <!-- Banner Image -->
+        <div class="h-44 sm:h-64 bg-gradient-to-br from-blue-500 to-indigo-600 relative overflow-hidden bg-slate-100 dark:bg-slate-950">
+            {% if profile.banner %}
+                <img src="{{ profile.banner.url }}" alt="Cover Banner" class="w-full h-full object-cover">
+            {% endif %}
+            <div class="absolute inset-0 bg-slate-950/20"></div>
+        </div>
+
+        <!-- Details Bar -->
+        <div class="px-6 sm:px-10 pb-8 sm:pb-10 relative flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            
+            <!-- Avatar & Profile Details Column -->
+            <div class="flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-20 sm:-mt-24 text-center sm:text-left">
+                <!-- Avatar image with border -->
+                <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white dark:border-slate-900 overflow-hidden shadow-md bg-slate-200 dark:bg-slate-850 flex-shrink-0 relative group">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ target_user.username }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full bg-blue-600 text-white font-bold text-5xl flex items-center justify-center font-outfit">
+                            {{ target_user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Identity Details -->
+                <div class="mb-2">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold font-outfit text-slate-900 dark:text-slate-100 flex items-center gap-2 justify-center sm:justify-start">
+                        {{ target_user.username }}
+                        {% if profile.is_moderator %}
+                            <span class="text-[10px] uppercase tracking-wider font-extrabold bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded border border-blue-200/50">Staff</span>
+                        {% endif %}
+                    </h2>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                        Member since {{ profile.joined_date|date:"F Y" }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Profile Action Buttons -->
+            <div class="flex items-center justify-center gap-3 self-center sm:self-end">
+                {% if target_user == user %}
+                    <!-- Edit Profile link -->
+                    <a href="{% url 'profile_edit' %}" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-full text-sm shadow-sm transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-user-gear"></i> Edit Profile
+                    </a>
+                {% else %}
+                    <!-- Follow / Unfollow AJAX button -->
+                    {% if user.is_authenticated %}
+                        <button id="follow-btn" class="font-bold px-8 py-3 rounded-full text-sm shadow-md hover:scale-[1.02] transition-all flex items-center gap-2 {% if is_following %}bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-red-50 hover:text-red-500{% else %}bg-blue-600 text-white hover:bg-blue-500{% endif %}" data-username="{{ target_user.username }}">
+                            <i class="fa-solid {% if is_following %}fa-user-minus{% else %}fa-user-plus{% endif %}"></i>
+                            <span class="label">{% if is_following %}Following{% else %}Follow{% endif %}</span>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-full text-sm shadow-md transition-all">
+                            Follow
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Profile Bio & Social Grid -->
+        <div class="px-6 sm:px-10 py-6 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col md:flex-row gap-6 justify-between items-start">
+            <!-- Biography -->
+            <div class="max-w-2xl">
+                <h4 class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500 mb-2">Biography</h4>
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    {{ profile.bio|default:"No introduction provided yet. Campus Thoughts is better when we share!" }}
+                </p>
+            </div>
+
+            <!-- Social Links Strip -->
+            <div class="flex flex-col gap-2 w-full md:w-auto">
+                <h4 class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500 mb-2">Social Connections</h4>
+                <div class="flex flex-wrap gap-3">
+                    {% if profile.website %}
+                        <a href="{{ profile.website }}" target="_blank" class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center transition shadow-sm" title="Website"><i class="fa-solid fa-globe"></i></a>
+                    {% endif %}
+                    {% if profile.github %}
+                        <a href="{{ profile.github }}" target="_blank" class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center transition shadow-sm" title="GitHub"><i class="fa-brands fa-github text-lg"></i></a>
+                    {% endif %}
+                    {% if profile.linkedin %}
+                        <a href="{{ profile.linkedin }}" target="_blank" class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center transition shadow-sm" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    {% endif %}
+                    {% if profile.twitter %}
+                        <a href="{{ profile.twitter }}" target="_blank" class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center transition shadow-sm" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    {% endif %}
+                    {% if not profile.website and not profile.github and not profile.linkedin and not profile.twitter %}
+                        <span class="text-xs text-slate-400 dark:text-slate-500 italic">No social links configured.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytical counters grid -->
+        <div class="grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800/85">
+            <div class="py-5 text-center flex flex-col gap-1">
+                <span class="text-2xl font-black font-outfit text-slate-800 dark:text-slate-200">{{ posts.count }}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">Publications</span>
+            </div>
+            <div class="py-5 text-center flex flex-col gap-1">
+                <span id="followers-count" class="text-2xl font-black font-outfit text-slate-800 dark:text-slate-200">{{ followers_count }}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">Followers</span>
+            </div>
+            <div class="py-5 text-center flex flex-col gap-1">
+                <span class="text-2xl font-black font-outfit text-slate-800 dark:text-slate-200">{{ following_count }}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">Following</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publications List Grid -->
+    <div>
+        <h3 class="text-xl sm:text-2xl font-bold font-outfit text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-book-open"></i> Publications by {{ target_user.username }}
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for post in posts %}
+            <article class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 overflow-hidden flex flex-col h-full group">
+                
+                <div class="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-950">
+                    {% if post.photo %}
+                        <img src="{{ post.photo.url }}" alt="{{ post.text }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+                            <i class="fa-solid fa-graduation-cap text-4xl text-blue-600/30"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <span class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 text-blue-600 dark:text-blue-400 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full backdrop-blur-md">
+                        {{ post.category }}
+                    </span>
+                </div>
+
+                <div class="p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] text-slate-400 dark:text-slate-500 block mb-2">{{ post.created_at }}</span>
+                        <a href="{% url 'full_blog' slug=post.slug %}" class="block group-hover:text-blue-600 transition">
+                            <h4 class="text-base font-bold font-outfit text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
+                                {{ post.text }}
+                            </h4>
+                        </a>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">
+                            {{ post.description|striptags }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80">
+                        <div class="flex items-center gap-3 text-slate-400 dark:text-slate-500 text-[10px] font-semibold">
+                            <span>❤️ {{ post.likes.count }}</span>
+                            <span>👁️ {{ post.views_count }}</span>
+                        </div>
+                        <a href="{% url 'full_blog' slug=post.slug %}" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                            Read Thought
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="col-span-full py-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800/40">
+                <i class="fa-regular fa-folder-open text-4xl text-slate-300 dark:text-slate-700 mb-3 block"></i>
+                <p class="text-sm text-slate-500 dark:text-slate-400">No public articles shared yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- AJAX FOLLOW TRIGGER SCRIPT -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const followBtn = document.getElementById("follow-btn");
+        if (followBtn) {
+            followBtn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                
+                // Fetch CSRF Token
+                function getCookie(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                const csrftoken = getCookie('csrftoken');
+                const username = followBtn.dataset.username;
+
+                try {
+                    const response = await fetch(`/user/${username}/follow-toggle/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrftoken,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    const data = await response.json();
+                    
+                    const countElem = document.getElementById("followers-count");
+                    const iconElem = followBtn.querySelector("i");
+                    const labelElem = followBtn.querySelector(".label");
+
+                    if (data.following) {
+                        followBtn.className = "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-red-50 hover:text-red-500 font-bold px-8 py-3 rounded-full text-sm shadow-md hover:scale-[1.02] transition-all flex items-center gap-2";
+                        iconElem.className = "fa-solid fa-user-minus";
+                        labelElem.textContent = "Following";
+                    } else {
+                        followBtn.className = "bg-blue-600 text-white hover:bg-blue-500 font-bold px-8 py-3 rounded-full text-sm shadow-md hover:scale-[1.02] transition-all flex items-center gap-2";
+                        iconElem.className = "fa-solid fa-user-plus";
+                        labelElem.textContent = "Follow";
+                    }
+                    
+                    countElem.textContent = data.followers_count;
+                } catch (error) {
+                    console.error("Error toggling follow:", error);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
