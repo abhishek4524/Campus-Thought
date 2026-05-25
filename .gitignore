@@ -1,0 +1,36 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python compiled files
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django Database
+db.sqlite3
+*.sqlite3
+
+# Environment variables
+.env
+
+# Media / Uploaded files
+# Un-comment the line below if you don't want to upload media files to GitHub
+# campusThoughts/media/
+
+# IDE / Editor config
+.vscode/
+.idea/
+
+# Antigravity artifacts
+artifacts/
+
+# Static build outputs
+staticfiles/
+
+# OS files
+.DS_Store
+Thumbs.db
