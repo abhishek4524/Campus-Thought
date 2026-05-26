@@ -1,14 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
-from django.http import JsonResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.views import View
+from django.views.generic.edit import CreateView, UpdateView
+from django.contrib.auth.decorators import login_required
 import re
 
 from .models import Post, Comment, Profile, Follow, Notification, SiteSetting, LoginActivityLog
@@ -140,34 +144,82 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 # Blog CRUD Operations
-@login_required
-def blog_create(request):
-    if request.method == "POST":
-        form = BlogForm(request.POST, request.FILES)
-        if form.is_valid():
-            blog = form.save(commit=False)
-            blog.user = request.user
-            blog.save()
-            return redirect('home')
-    else:
-        form = BlogForm()
-    return render(request, 'blog_form.html', {'form': form, 'title': 'Create Campus Thought'})
+class BlogCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = BlogForm
+    template_name = 'blog_form.html'
+    success_url = reverse_lazy('home')
 
-@login_required
-def blog_edit(request, post_id):
-    post_obj = get_object_or_404(Post, pk=post_id)
-    # Authorization checks
-    if post_obj.user != request.user and not request.user.is_superuser:
-        return redirect('home')
-        
-    if request.method == "POST":
-        form = BlogForm(request.POST, request.FILES, instance=post_obj)
-        if form.is_valid():
-            blog = form.save()
-            return redirect('full_blog', slug=blog.slug)
-    else:
-        form = BlogForm(instance=post_obj)
-    return render(request, 'blog_form.html', {'form': form, 'post': post_obj, 'title': 'Edit Campus Thought'})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Create Campus Thought'
+        context['autosave_endpoint'] = reverse_lazy('blog_autosave')
+        context['draft'] = None
+        return context
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.is_draft = form.cleaned_data.get('is_draft', False)
+        if not form.instance.seo_title:
+            form.instance.seo_title = form.instance.text[:140]
+        if not form.instance.seo_description and form.instance.description:
+            form.instance.seo_description = form.instance.description[:160]
+        response = super().form_valid(form)
+        return redirect('full_blog', slug=self.object.slug)
+
+class BlogEditView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = BlogForm
+    template_name = 'blog_form.html'
+    pk_url_kwarg = 'post_id'
+
+    def get_object(self, queryset=None):
+        post = super().get_object(queryset)
+        if post.user != self.request.user and not self.request.user.is_superuser:
+            raise PermissionDenied
+        return post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Edit Campus Thought'
+        context['post'] = self.object
+        context['autosave_endpoint'] = reverse_lazy('blog_autosave')
+        return context
+
+    def form_valid(self, form):
+        form.instance.is_draft = form.cleaned_data.get('is_draft', self.object.is_draft)
+        if not form.instance.seo_title:
+            form.instance.seo_title = form.instance.text[:140]
+        if not form.instance.seo_description and form.instance.description:
+            form.instance.seo_description = form.instance.description[:160]
+        return super().form_valid(form)
+
+class BlogAutosaveView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        data = request.POST.copy()
+        post_id = data.get('post_id')
+        if post_id:
+            post = get_object_or_404(Post, pk=post_id, user=request.user)
+            form = BlogForm(data, request.FILES, instance=post)
+        else:
+            form = BlogForm(data, request.FILES)
+
+        if not form.is_valid():
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+        draft = form.save(commit=False)
+        draft.user = request.user
+        draft.is_draft = True
+        draft.last_autosaved_at = timezone.now()
+        draft.save()
+
+        return JsonResponse({
+            'success': True,
+            'post_id': draft.id,
+            'slug': draft.slug,
+            'last_saved': draft.last_autosaved_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'draft': draft.is_draft,
+        })
 
 @login_required
 def blog_delete(request, post_id): 

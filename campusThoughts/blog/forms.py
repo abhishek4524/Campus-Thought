@@ -1,38 +1,82 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from .models import Post, Comment, Profile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from ckeditor.widgets import CKEditorWidget
+
+MAX_IMAGE_UPLOAD_SIZE = 6 * 1024 * 1024
+ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/pjpeg', 'image/png', 'image/webp']
 
 class BlogForm(forms.ModelForm):
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'sr-only',
+            'id': 'editor-content',
+            'aria-hidden': 'true'
+        })
+    )
+
     class Meta:
         model = Post
         fields = ['text', 'description', 'photo', 'category', 'is_draft', 'seo_title', 'seo_description']
         widgets = {
             'text': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition',
-                'placeholder': 'Enter a catchy title for your campus thoughts...'
+                'class': 'w-full rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition px-4 py-3 shadow-sm',
+                'placeholder': 'Start with a magnetic headline',
+                'maxlength': '150'
             }),
             'category': forms.Select(attrs={
-                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition'
+                'class': 'w-full rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition px-4 py-3 shadow-sm'
             }),
             'is_draft': forms.CheckboxInput(attrs={
-                'class': 'rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500'
+                'class': 'h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500'
             }),
             'seo_title': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition',
-                'placeholder': 'SEO Optimized Title (defaults to post title)'
+                'class': 'w-full rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition px-4 py-3 shadow-sm',
+                'placeholder': 'SEO title (auto-generated from headline if left blank)',
+                'maxlength': '140'
             }),
             'seo_description': forms.Textarea(attrs={
-                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition',
-                'placeholder': 'Short summary for search engine results...',
-                'rows': 3
+                'class': 'w-full rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition px-4 py-3 shadow-sm',
+                'placeholder': 'Summarize the article for search results',
+                'rows': 4,
+                'maxlength': '160'
+            }),
+            'photo': forms.ClearableFileInput(attrs={
+                'class': 'hidden',
+                'id': 'photo-upload-input'
             })
         }
-    
-    description = forms.CharField(widget=CKEditorWidget(attrs={
-        'placeholder': 'Write your thoughts here...'
-    }))
+
+    def clean_text(self):
+        text = self.cleaned_data.get('text', '').strip()
+        if not text:
+            raise ValidationError('A headline is required.')
+        if len(text) > 150:
+            raise ValidationError('Title cannot exceed 150 characters.')
+        return text
+
+    def clean_seo_title(self):
+        seo_title = self.cleaned_data.get('seo_title', '').strip()
+        if seo_title and len(seo_title) > 140:
+            raise ValidationError('SEO title must be 140 characters or fewer.')
+        return seo_title
+
+    def clean_seo_description(self):
+        seo_description = self.cleaned_data.get('seo_description', '').strip()
+        if seo_description and len(seo_description) > 160:
+            raise ValidationError('Meta description must be 160 characters or fewer.')
+        return seo_description
+
+    def clean_photo(self):
+        image = self.cleaned_data.get('photo')
+        if image:
+            if image.size > MAX_IMAGE_UPLOAD_SIZE:
+                raise ValidationError('Upload cannot exceed 6 MB.')
+            if image.content_type not in ALLOWED_IMAGE_TYPES:
+                raise ValidationError('Only JPEG, PNG, and WEBP files are allowed.')
+        return image
         
 class CommentForm(forms.ModelForm):
     class Meta:

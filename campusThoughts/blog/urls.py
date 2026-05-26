@@ -19,9 +19,10 @@ router.register(r'notifications', api_views.NotificationViewSet, basename='api_n
 urlpatterns = [
     # Core Front-End HTML Views
     path('', views.home, name='home'),
-    path('create/', views.blog_create, name='blog_create'),
+    path('create/', views.BlogCreateView.as_view(), name='blog_create'),
     path('post/<slug:slug>/', views.full_blog, name='full_blog'),
-    path('<int:post_id>/edit/', views.blog_edit, name='blog_edit'),
+    path('<int:post_id>/edit/', views.BlogEditView.as_view(), name='blog_edit'),
+    path('autosave/', views.BlogAutosaveView.as_view(), name='blog_autosave'),
     path('<int:post_id>/delete/', views.blog_delete, name='blog_delete'),
     
     # User Profile & Follows

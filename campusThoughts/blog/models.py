@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from ckeditor.fields import RichTextField
+from django.utils.html import strip_tags
 from django.utils.text import slugify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -36,7 +36,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=150)  # Replaces 'title' to maintain backward compatibility
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True)
-    description = RichTextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     photo = models.ImageField(upload_to='photos/', blank=True, null=True)
     category = models.CharField(max_length=11, choices=BLOG_TYPE_CHOICE, default='Programming')
     is_draft = models.BooleanField(default=False)
@@ -46,6 +46,7 @@ class Post(models.Model):
     bookmarks = models.ManyToManyField(User, related_name='bookmarked_posts', blank=True)
     seo_title = models.CharField(max_length=150, blank=True, null=True)
     seo_description = models.TextField(blank=True, null=True)
+    last_autosaved_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -53,7 +54,7 @@ class Post(models.Model):
         return f'{self.user.username} - {self.text[:30]}'
 
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if self.text and not self.slug:
             original_slug = slugify(self.text)
             unique_slug = original_slug
             num = 1
@@ -61,17 +62,26 @@ class Post(models.Model):
                 unique_slug = f'{original_slug}-{num}'
                 num += 1
             self.slug = unique_slug
-        
-        if not self.seo_title:
+
+        if not self.seo_title and self.text:
             self.seo_title = self.text[:140]
-            
+
+        if self.description and not self.seo_description:
+            self.seo_description = strip_tags(self.description)[:160]
+
         super().save(*args, **kwargs)
 
     @property
+    def description_plain(self):
+        return strip_tags(self.description or '')
+
+    @property
+    def word_count(self):
+        return len(self.description_plain.split())
+
+    @property
     def read_time(self):
-        # Calculate approximate reading time (200 words per minute average)
-        word_count = len(self.description.split()) if self.description else 0
-        minutes = max(1, round(word_count / 200))
+        minutes = max(1, round(self.word_count / 200))
         return f"{minutes} min read"
 
 class Comment(models.Model):

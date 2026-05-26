@@ -1,117 +1,463 @@
 {% extends "layout.html" %}
 
 {% block title %}
-{% if post %}Edit: {{ post.text }}{% else %}Share Your Thoughts{% endif %} — Campus Thoughts
+{% if post %}Edit: {{ post.text }}{% else %}Write a Premium Campus Thought{% endif %} — Campus Thoughts
+{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+    .editor-shell {
+        background: rgba(255,255,255,.82);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(148,163,184,.15);
+        box-shadow: 0 40px 120px rgba(15,23,42,.08);
+    }
+    .editor-toolbar .ql-picker .ql-picker-label,
+    .editor-toolbar .ql-picker .ql-picker-item,
+    .editor-toolbar button,
+    .editor-toolbar select {
+        border-radius: 9999px;
+    }
+    .editor-toolbar .ql-stroke {
+        stroke: #334155;
+    }
+    .editor-toolbar .ql-picker-label,
+    .editor-toolbar .ql-toolbar button,
+    .editor-toolbar .ql-toolbar select {
+        transition: all .2s ease;
+    }
+    .ql-container {
+        border: 0 !important;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1rem;
+        line-height: 1.75;
+    }
+    .ql-editor {
+        min-height: 420px;
+        padding: 1.5rem 1.25rem;
+        color: #0f172a;
+        background: transparent;
+    }
+    .dark .ql-editor {
+        color: #e2e8f0;
+    }
+    .ql-editor p {
+        margin: 0 0 1.15rem;
+    }
+    .ql-editor h1,
+    .ql-editor h2,
+    .ql-editor h3 {
+        margin: 1.35rem 0 .75rem;
+        font-weight: 700;
+    }
+    .image-drop-zone {
+        border: 2px dashed rgba(96,165,250,.65);
+        background: linear-gradient(180deg, rgba(236,240,255,.95), rgba(255,255,255,.72));
+    }
+    .image-drop-zone:hover {
+        background: linear-gradient(180deg, rgba(224,231,255,.95), rgba(255,255,255,.9));
+    }
+    .image-preview img {
+        max-height: 320px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 1.5rem;
+    }
+    .glass-panel {
+        background: rgba(15,23,42,.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(148,163,184,.18);
+    }
+</style>
 {% endblock %}
 
 {% block swiper %}
-<!-- Disables top slider for focused blog writing -->
+<!-- Hidden swiper to keep page focused on editor -->
 {% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm p-6 sm:p-10 transition-colors">
-    
-    <!-- Title header -->
-    <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100 dark:border-slate-800/80">
-        <i class="fa-solid fa-feather-pointed text-2xl text-blue-600"></i>
-        <h2 class="text-2xl font-extrabold font-outfit text-slate-900 dark:text-slate-100">
-            {% if form.instance.pk %}Edit Campus Thought{% else %}Write New Campus Thought{% endif %}
-        </h2>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="sticky top-24 z-20 mb-6 rounded-3xl glassmorphic border border-slate-200/60 dark:border-slate-800/60 shadow-xl px-5 py-4 backdrop-blur-sm transition">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="space-y-2">
+                <p class="text-xs uppercase tracking-[0.32em] text-slate-400">Campus Thoughts Editor</p>
+                <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                    {% if post %}Edit your story{% else %}Publish a premium campus article{% endif %}
+                </h1>
+                <p class="max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">Write with confidence, manage your SEO, and save drafts automatically as you build your narrative.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3">
+                    <span class="block text-[11px] uppercase tracking-[0.4em] text-slate-400">Word Count</span>
+                    <span id="word-count" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">0</span>
+                </div>
+                <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3">
+                    <span class="block text-[11px] uppercase tracking-[0.4em] text-slate-400">Read Time</span>
+                    <span id="reading-time" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">1 min read</span>
+                </div>
+                <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3">
+                    <span class="block text-[11px] uppercase tracking-[0.4em] text-slate-400">Draft Status</span>
+                    <span id="save-status" class="mt-2 text-xl font-semibold text-emerald-600 dark:text-emerald-400">Ready to write</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Form -->
-    <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-6 font-sans">
+    <form id="post-editor-form" method="POST" enctype="multipart/form-data" class="space-y-8">
         {% csrf_token %}
-        
-        <!-- Error alert -->
-        {% if form.errors %}
-        <div class="p-4 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-2xl border border-red-100 dark:border-red-900/30 text-sm">
-            <h4 class="font-bold mb-1">Please correct the following errors:</h4>
-            {{ form.non_field_errors }}
-            {% for field in form %}
-                {% if field.errors %}
-                    <p><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</p>
+        {% if post %}<input type="hidden" name="post_id" id="post-id" value="{{ post.id }}">{% endif %}
+        <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+            <div class="space-y-8">
+                {% if form.errors %}
+                <div class="rounded-3xl border border-red-200/80 bg-red-50/80 p-4 text-sm text-red-700 dark:border-red-800/60 dark:bg-red-950/20 dark:text-red-300">
+                    <strong class="block mb-2">Please fix these items before saving:</strong>
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <p><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
                 {% endif %}
-            {% endfor %}
-        </div>
-        {% endif %}
 
-        <!-- Blog Title -->
-        <div class="flex flex-col gap-2">
-            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Thought Title</label>
-            {{ form.text }}
-            <span class="text-[10px] text-slate-400 dark:text-slate-500">A clear, engaging headline. Maximum 150 characters.</span>
-        </div>
+                <section class="rounded-[2rem] editor-shell overflow-hidden">
+                    <div class="flex flex-col gap-4 p-6 sm:p-8">
+                        <div class="space-y-4">
+                            <label for="id_text" class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Post Title</label>
+                            {{ form.text }}
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
+                                <span>Maximum 150 characters</span>
+                                <span id="title-count" class="font-semibold text-slate-700 dark:text-slate-200">0 / 150</span>
+                            </div>
+                        </div>
 
-        <!-- Category & Draft Flag Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div class="flex flex-col gap-2">
-                <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Post Category</label>
-                {{ form.category }}
-            </div>
-            
-            <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-850/50 self-end h-[50px] sm:h-[58px]">
-                {{ form.is_draft }}
-                <div class="flex flex-col">
-                    <label for="id_is_draft" class="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Save as Draft</label>
-                    <span class="text-[9px] text-slate-400 dark:text-slate-500">Drafts are hidden from public grids.</span>
-                </div>
-            </div>
-        </div>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div class="space-y-3">
+                                <label class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Category</label>
+                                {{ form.category }}
+                            </div>
+                            <label class="group flex items-center gap-3 rounded-3xl border border-slate-200/80 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950/70 p-4 transition hover:border-blue-400/40">
+                                {{ form.is_draft }}
+                                <div>
+                                    <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Save as Draft</span>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400">Keep work private until you're ready.</span>
+                                </div>
+                            </label>
+                        </div>
 
-        <!-- Cover Image -->
-        <div class="flex flex-col gap-2">
-            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Cover Graphic / Photograph</label>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
-                {{ form.photo }}
-            </div>
-            {% if form.instance.photo %}
-                <div class="mt-2 text-xs text-slate-500">
-                    Currently selected: <a href="{{ form.instance.photo.url }}" target="_blank" class="text-blue-600 hover:underline">{{ form.instance.photo.name }}</a>
-                </div>
-            {% endif %}
-        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-4">
+                                <div>
+                                    <p class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Cover image</p>
+                                    <p class="text-xs text-slate-400 dark:text-slate-500">Drag, drop, or browse for a hero image.</p>
+                                </div>
+                                <button type="button" id="photo-upload-button" class="rounded-full bg-slate-900 text-white px-4 py-2 text-sm shadow-lg shadow-slate-900/10 transition hover:bg-slate-800">Choose image</button>
+                            </div>
+                            <div id="image-drop-zone" class="image-drop-zone rounded-[1.75rem] p-8 text-center transition">
+                                <div class="mx-auto max-w-xl space-y-4">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-600"></i>
+                                    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Drop a cover image here</p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">JPEG/PNG/WEBP formats, up to 6 MB.</p>
+                                </div>
+                                {{ form.photo }}
+                            </div>
+                            <div id="image-preview" class="image-preview hidden rounded-[1.75rem] overflow-hidden border border-slate-200 dark:border-slate-800">
+                                <img src="" alt="Cover preview" id="cover-preview-img">
+                                <div class="flex items-center justify-between bg-slate-950/80 px-4 py-3 text-white">
+                                    <span class="text-sm">Selected cover image</span>
+                                    <button type="button" id="remove-photo-button" class="text-sm text-slate-200 hover:text-white">Remove</button>
+                                </div>
+                            </div>
+                            {% if post and post.photo %}
+                            <div id="existing-photo" class="image-preview rounded-[1.75rem] overflow-hidden border border-slate-200 dark:border-slate-800">
+                                <img src="{{ post.photo.url }}" alt="Current cover image">
+                            </div>
+                            {% endif %}
+                        </div>
 
-        <!-- Description Rich Editor -->
-        <div class="flex flex-col gap-2">
-            <label class="text-xs uppercase tracking-wider font-extrabold text-slate-400 dark:text-slate-500">Story Body & Editorial Description</label>
-            <div class="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white text-slate-800">
-                {{ form.description }}
-            </div>
-        </div>
+                        <div class="space-y-4">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Story body</p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">Use commands or shortcuts to format headlines, lists, quotes, and code.</p>
+                                </div>
+                                <button type="button" id="toggle-focus-mode" class="rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-sm hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition">Toggle focus mode</button>
+                            </div>
+                            <div id="editor-toolbar" class="editor-toolbar rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-3 shadow-sm"></div>
+                            <div id="quill-editor" class="rounded-[1.75rem] border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-950 shadow-sm"></div>
+                        </div>
 
-        <!-- SEO Metadata Dropdown / Accordion -->
-        <div class="border-t border-slate-100 dark:border-slate-800/80 pt-6 mt-4">
-            <details class="group">
-                <summary class="flex items-center justify-between text-sm font-bold text-slate-600 dark:text-slate-400 cursor-pointer hover:text-blue-600 transition outline-none">
-                    <span>🔍 Advanced SEO Configuration</span>
-                    <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
-                </summary>
-                
-                <div class="flex flex-col gap-4 mt-6 pl-4 border-l-2 border-slate-100 dark:border-slate-850">
-                    <div class="flex flex-col gap-1">
-                        <label class="text-xs font-bold text-slate-500">SEO Custom Title</label>
-                        {{ form.seo_title }}
-                        <span class="text-[9px] text-slate-400">Best under 60 characters for search snippet previews.</span>
+                        <div class="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <div class="space-y-1">
+                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">SEO Title</p>
+                                <p id="seo-title-length" class="text-sm font-semibold text-slate-900 dark:text-slate-100">0 / 140</p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">Meta description</p>
+                                <p id="seo-description-count" class="text-sm font-semibold text-slate-900 dark:text-slate-100">0 / 160</p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">Google preview</p>
+                                <p id="google-preview" class="text-sm text-slate-500 dark:text-slate-400">Live preview will update as you type.</p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">Slug preview</p>
+                                <p id="slug-preview" class="text-sm font-semibold text-slate-900 dark:text-slate-100">---</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex flex-col gap-1">
-                        <label class="text-xs font-bold text-slate-500">SEO Meta Description</label>
-                        {{ form.seo_description }}
-                        <span class="text-[9px] text-slate-400">Summarize the article in 150-160 characters for Google results.</span>
+                </section>
+            </div>
+
+            <aside class="space-y-6">
+                <section class="rounded-[2rem] glass-panel p-6 text-slate-100">
+                    <h2 class="text-base font-semibold">Publishing controls</h2>
+                    <div class="mt-4 space-y-4 text-sm text-slate-300">
+                        <p><strong>Auto-save:</strong> every 30 seconds while active.</p>
+                        <p><strong>Draft mode:</strong> keep work private until ready.</p>
+                        <p><strong>SEO scoring:</strong> keep your title under 60 chars and descriptions near 155 chars.</p>
                     </div>
-                </div>
-            </details>
+                </section>
+
+                <section class="rounded-[2rem] border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-6 shadow-sm">
+                    <h2 class="text-sm font-semibold uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Live status</h2>
+                    <div class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                        <div class="rounded-3xl bg-slate-100 dark:bg-slate-900 p-4">
+                            <span class="block text-slate-500 dark:text-slate-400">Progress toward publication</span>
+                            <div class="mt-3 h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                <div id="story-progress" class="h-full w-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl bg-slate-100 dark:bg-slate-900 p-4">
+                            <span class="block text-slate-500 dark:text-slate-400">Last autosave</span>
+                            <span id="last-saved" class="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100">Not saved yet</span>
+                        </div>
+                    </div>
+                </section>
+            </aside>
         </div>
 
-        <!-- Form Actions -->
-        <div class="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800/80 pt-6 mt-4">
-            <a href="{% url 'home' %}" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-full text-sm transition">
-                Cancel
-            </a>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-full text-sm shadow-md shadow-blue-500/10 transition">
-                Save & Publish
-            </button>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                <p>Need inspiration? Write with clarity, format for readers, and publish with confidence.</p>
+            </div>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <a href="{% url 'home' %}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">Cancel</a>
+                <button type="submit" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 text-sm font-semibold text-white shadow-2xl shadow-blue-500/10 transition hover:scale-[1.01]">Save & Publish</button>
+            </div>
         </div>
     </form>
 </div>
+
+<script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+<script>
+    const autosaveEndpoint = '{{ autosave_endpoint|default:"" }}';
+    const form = document.getElementById('post-editor-form');
+    const titleInput = document.getElementById('id_text');
+    const seoTitleInput = document.getElementById('id_seo_title');
+    const seoDescriptionInput = document.getElementById('id_seo_description');
+    const editorContent = document.getElementById('editor-content');
+    const wordCountEl = document.getElementById('word-count');
+    const readingTimeEl = document.getElementById('reading-time');
+    const titleCountEl = document.getElementById('title-count');
+    const seoTitleLengthEl = document.getElementById('seo-title-length');
+    const seoDescriptionCountEl = document.getElementById('seo-description-count');
+    const slugPreview = document.getElementById('slug-preview');
+    const googlePreview = document.getElementById('google-preview');
+    const saveStatus = document.getElementById('save-status');
+    const lastSaved = document.getElementById('last-saved');
+    const storyProgress = document.getElementById('story-progress');
+    const focusToggle = document.getElementById('toggle-focus-mode');
+    const dropZone = document.getElementById('image-drop-zone');
+    const uploadInput = document.getElementById('photo-upload-input');
+    const uploadButton = document.getElementById('photo-upload-button');
+    const imagePreviewSection = document.getElementById('image-preview');
+    const coverPreviewImage = document.getElementById('cover-preview-img');
+    const removePhotoButton = document.getElementById('remove-photo-button');
+    let isDirty = false;
+    let autosaveTimer = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function slugifyText(value) {
+        return value.toString().toLowerCase().trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    const quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ header: [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                ['blockquote', 'code-block'],
+                ['link'],
+                [{ color: [] }, { background: [] }],
+                ['clean']
+            ],
+            keyboard: {
+                bindings: {
+                    bold: { key: 'B', shortKey: true },
+                    italic: { key: 'I', shortKey: true },
+                    underline: { key: 'U', shortKey: true }
+                }
+            }
+        },
+        placeholder: 'Write your story, insert emojis, and publish your best campus insight.',
+    });
+
+    function updateEditorState() {
+        const html = quill.root.innerHTML.trim();
+        editorContent.value = html === '<p><br></p>' ? '' : html;
+
+        const text = quill.getText().trim();
+        const wordCount = text ? text.split(/\s+/).length : 0;
+        wordCountEl.textContent = wordCount;
+        readingTimeEl.textContent = `${Math.max(1, Math.round(wordCount / 200))} min read`;
+        titleCountEl.textContent = `${titleInput.value.length} / 150`;
+        seoTitleLengthEl.textContent = `${(seoTitleInput.value || titleInput.value).length} / 140`;
+        seoDescriptionCountEl.textContent = `${seoDescriptionInput.value.length} / 160`;
+
+        const titleText = seoTitleInput.value.trim() || titleInput.value.trim();
+        googlePreview.textContent = titleText ? titleText : 'SEO preview will appear here';
+        slugPreview.textContent = titleInput.value ? slugifyText(titleInput.value) : '---';
+
+        const progress = Math.min(100, Math.round((wordCount / 750) * 100));
+        storyProgress.style.width = `${progress}%`;
+        storyProgress.setAttribute('aria-valuenow', progress);
+
+        isDirty = true;
+    }
+
+    quill.on('text-change', () => {
+        updateEditorState();
+        saveStatus.textContent = 'Unsaved changes';
+        saveStatus.classList.remove('text-emerald-600');
+        saveStatus.classList.add('text-amber-500');
+    });
+
+    titleInput.addEventListener('input', updateEditorState);
+    seoTitleInput.addEventListener('input', updateEditorState);
+    seoDescriptionInput.addEventListener('input', updateEditorState);
+
+    function handleFile(file) {
+        if (!file) return;
+        if (!['image/jpeg', 'image/png', 'image/webp', 'image/pjpeg'].includes(file.type)) {
+            alert('Only JPEG, PNG, and WEBP images are supported.');
+            return;
+        }
+        if (file.size > 6 * 1024 * 1024) {
+            alert('Image size must be 6 MB or less.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            coverPreviewImage.src = event.target.result;
+            imagePreviewSection.classList.remove('hidden');
+            const existing = document.getElementById('existing-photo');
+            if (existing) {
+                existing.classList.add('hidden');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    uploadButton.addEventListener('click', () => uploadInput.click());
+    uploadInput.addEventListener('change', () => handleFile(uploadInput.files[0]));
+
+    dropZone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropZone.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
+    });
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+    });
+    dropZone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
+        const file = event.dataTransfer.files[0];
+        if (file) {
+            uploadInput.files = event.dataTransfer.files;
+            handleFile(file);
+        }
+    });
+
+    removePhotoButton.addEventListener('click', () => {
+        uploadInput.value = '';
+        coverPreviewImage.src = '';
+        imagePreviewSection.classList.add('hidden');
+    });
+
+    focusToggle.addEventListener('click', () => {
+        document.querySelector('body').classList.toggle('overflow-hidden');
+        document.querySelector('.editor-shell').classList.toggle('max-w-4xl');
+    });
+
+    function autoSaveDraft() {
+        if (!isDirty || !autosaveEndpoint) return;
+        updateEditorState();
+        const payload = new FormData(form);
+        fetch(autosaveEndpoint, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: payload,
+            credentials: 'same-origin'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let hiddenField = document.getElementById('post-id');
+                    if (!hiddenField) {
+                        hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = 'post_id';
+                        hiddenField.id = 'post-id';
+                        form.appendChild(hiddenField);
+                    }
+                    hiddenField.value = data.post_id;
+                    saveStatus.textContent = 'Draft saved';
+                    saveStatus.classList.remove('text-amber-500', 'text-rose-500');
+                    saveStatus.classList.add('text-emerald-600');
+                    lastSaved.textContent = new Date().toLocaleString();
+                    isDirty = false;
+                } else {
+                    saveStatus.textContent = 'Save failed';
+                    saveStatus.classList.remove('text-emerald-600');
+                    saveStatus.classList.add('text-rose-500');
+                }
+            })
+            .catch(() => {
+                saveStatus.textContent = 'Auto-save error';
+                saveStatus.classList.remove('text-emerald-600');
+                saveStatus.classList.add('text-rose-500');
+            });
+    }
+
+    form.addEventListener('submit', () => {
+        updateEditorState();
+    });
+
+    autosaveTimer = setInterval(autoSaveDraft, 30000);
+    updateEditorState();
+</script>
 {% endblock %}
