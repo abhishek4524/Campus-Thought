@@ -78,12 +78,21 @@ class BlogForm(forms.ModelForm):
 
     def clean_photo(self):
         image = self.cleaned_data.get('photo')
-        if image:
+        if not image:
+            return image
+
+    # Cloudinary existing image resource
+        if hasattr(image, 'public_id'):
+            return image
+
+    # Newly uploaded local file
+        if hasattr(image, 'size'):
             if image.size > MAX_IMAGE_UPLOAD_SIZE:
-                raise ValidationError('Upload cannot exceed 6 MB.')
-            if image.content_type not in ALLOWED_IMAGE_TYPES:
-                raise ValidationError('Only JPEG, PNG, and WEBP files are allowed.')
-        return image
+                raise forms.ValidationError(
+                "Image size must be under 6MB."
+            )
+
+            return image
         
 class CommentForm(forms.ModelForm):
     class Meta:
