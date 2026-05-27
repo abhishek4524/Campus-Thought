@@ -627,6 +627,12 @@
         dataTransfer.items.add(file);
         uploadInput.files = dataTransfer.files;
         
+        // Remove the clear input if it exists, since we are uploading a new one
+        const clearInput = document.getElementById("photo-clear-input");
+        if (clearInput) {
+            clearInput.remove();
+        }
+        
         isDirty = true;
         saveStatus.textContent = "Unsaved changes";
         saveStatus.classList.remove("text-emerald-600");
@@ -704,7 +710,18 @@
         
         const existingPhoto = document.getElementById("existing-photo");
         if (existingPhoto) {
-          existingPhoto.classList.remove("hidden");
+          existingPhoto.classList.add("hidden"); // Hide the existing photo preview
+          
+          // Inject a hidden clear checkbox for Django to process the removal
+          let clearInput = document.getElementById("photo-clear-input");
+          if (!clearInput) {
+            clearInput = document.createElement("input");
+            clearInput.type = "hidden";
+            clearInput.name = "photo-clear";
+            clearInput.id = "photo-clear-input";
+            clearInput.value = "on";
+            form.appendChild(clearInput);
+          }
         }
         
         isDirty = true;
@@ -720,8 +737,26 @@
         document.body.classList.toggle("overflow-hidden");
         const editorShell = document.querySelector(".editor-shell");
         if (editorShell) {
-          editorShell.classList.toggle("max-w-4xl");
-          editorShell.classList.toggle("mx-auto");
+          editorShell.classList.toggle("fixed");
+          editorShell.classList.toggle("inset-0");
+          editorShell.classList.toggle("z-50");
+          editorShell.classList.toggle("w-full");
+          editorShell.classList.toggle("h-screen");
+          editorShell.classList.toggle("overflow-y-auto");
+          editorShell.classList.toggle("bg-white");
+          editorShell.classList.toggle("dark:bg-slate-950");
+          editorShell.classList.toggle("p-4");
+          editorShell.classList.toggle("sm:p-10");
+          
+          // Switch icon
+          const icon = focusToggle.querySelector("i");
+          if (icon.classList.contains("fa-expand")) {
+            icon.classList.remove("fa-expand");
+            icon.classList.add("fa-compress");
+          } else {
+            icon.classList.remove("fa-compress");
+            icon.classList.add("fa-expand");
+          }
         }
       });
     }

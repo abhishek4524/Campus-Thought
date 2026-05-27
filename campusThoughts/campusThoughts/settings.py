@@ -14,11 +14,13 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-import dj_database_url
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables explicitly from the root directory
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+import dj_database_url
 
 
 # Quick-start development settings - unsuitable for production
@@ -135,19 +137,26 @@ USE_I18N = True
 
 USE_TZ = True
 
+import cloudinary
+
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'unconfigured_cloud'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', 'unconfigured_api'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', 'unconfigured_secret'),
     'SECURE': True,
     'SIGNED_UPLOAD': True,
 }
 
-# Only use Cloudinary when credentials are configured; fall back to local storage otherwise
-if os.getenv('CLOUDINARY_CLOUD_NAME'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-else:
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Core Cloudinary configuration required by CloudinaryField
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME', 'unconfigured_cloud'),
+    api_key=os.getenv('CLOUDINARY_API_KEY', 'unconfigured_api'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', 'unconfigured_secret'),
+    secure=True
+)
+
+# Enforce Cloudinary for all media uploads for production persistence
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

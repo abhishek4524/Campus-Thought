@@ -109,27 +109,52 @@
                             <i class="fa-solid fa-pen-nib"></i> Write Post
                         </a>
 
-                        <!-- User Profile Dropdown / Card -->
-                        <a href="{% url 'profile_detail' username=user.username %}" class="flex items-center gap-2 sm:gap-3 p-1 pl-1 pr-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 transition border border-slate-200/40 dark:border-slate-800/40">
-                            {% if user.profile.avatar %}
-                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover">
-                            {% else %}
-                                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-100 dark:bg-slate-800 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
-                                    {{ user.username|first|upper }}
-                                </div>
-                            {% endif %}
-                            <span class="hidden sm:inline text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {{ user.username }}
-                            </span>
-                        </a>
-
-                        <!-- Logout -->
-                        <form method="POST" action="{% url 'logout' %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" class="p-2 sm:p-3 rounded-full hover:bg-red-50/50 dark:hover:bg-red-950/20 text-red-500 transition" title="Logout">
-                                <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                        <!-- User Profile Dropdown -->
+                        <div class="relative inline-block text-left" id="profile-dropdown-container">
+                            <button type="button" id="profile-menu-button" class="flex items-center gap-2 sm:gap-3 p-1 pl-1 pr-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 transition border border-slate-200/40 dark:border-slate-800/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer" aria-expanded="false" aria-haspopup="true">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shadow-sm">
+                                {% else %}
+                                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-100 dark:bg-slate-800 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-sm shadow-sm">
+                                        {{ user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <span class="hidden sm:inline text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    {{ user.username }}
+                                </span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 dark:text-slate-500 transition-transform duration-200" id="profile-dropdown-icon"></i>
                             </button>
-                        </form>
+
+                            <!-- Dropdown Menu -->
+                            <div id="profile-dropdown-menu" class="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-slate-900/10 dark:shadow-black/40 ring-1 ring-slate-200/50 dark:ring-slate-800/50 transform scale-95 opacity-0 invisible transition-all duration-200" role="menu" aria-orientation="vertical" aria-labelledby="profile-menu-button">
+                                <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800/80">
+                                    <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">{{ user.username }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ user.email }}</p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="{% url 'profile_detail' username=user.username %}" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/80 transition" role="menuitem">
+                                        <i class="fa-regular fa-user text-slate-400 w-4"></i> My Profile
+                                    </a>
+                                    <a href="{% url 'blog_create' %}" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/80 transition" role="menuitem">
+                                        <i class="fa-regular fa-pen-to-square text-slate-400 w-4"></i> Write Post
+                                    </a>
+                                    <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/80 transition opacity-60 cursor-not-allowed" role="menuitem" title="Coming soon">
+                                        <i class="fa-regular fa-file-lines text-slate-400 w-4"></i> Drafts
+                                    </a>
+                                    <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/80 transition opacity-60 cursor-not-allowed" role="menuitem" title="Coming soon">
+                                        <i class="fa-solid fa-gear text-slate-400 w-4"></i> Settings
+                                    </a>
+                                </div>
+                                <div class="p-2 border-t border-slate-100 dark:border-slate-800/80">
+                                    <form method="POST" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30 transition" role="menuitem">
+                                            <i class="fa-solid fa-arrow-right-from-bracket text-red-400 w-4"></i> Sign out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     {% else %}
                         <!-- Login & Register Actions -->
                         <a href="{% url 'login' %}" class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all px-4 py-2">
@@ -246,6 +271,40 @@
                 }
             }
         });
+
+        // Profile Dropdown Toggle Script
+        var profileMenuBtn = document.getElementById('profile-menu-button');
+        var profileDropdown = document.getElementById('profile-dropdown-menu');
+        var profileDropdownIcon = document.getElementById('profile-dropdown-icon');
+        
+        if (profileMenuBtn && profileDropdown) {
+            profileMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isExpanded = profileMenuBtn.getAttribute('aria-expanded') === 'true';
+                
+                if (isExpanded) {
+                    profileDropdown.classList.remove('scale-100', 'opacity-100', 'visible');
+                    profileDropdown.classList.add('scale-95', 'opacity-0', 'invisible');
+                    profileDropdownIcon.classList.remove('rotate-180');
+                    profileMenuBtn.setAttribute('aria-expanded', 'false');
+                } else {
+                    profileDropdown.classList.remove('scale-95', 'opacity-0', 'invisible');
+                    profileDropdown.classList.add('scale-100', 'opacity-100', 'visible');
+                    profileDropdownIcon.classList.add('rotate-180');
+                    profileMenuBtn.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (profileMenuBtn.getAttribute('aria-expanded') === 'true' && !event.target.closest('#profile-dropdown-container')) {
+                    profileDropdown.classList.remove('scale-100', 'opacity-100', 'visible');
+                    profileDropdown.classList.add('scale-95', 'opacity-0', 'invisible');
+                    profileDropdownIcon.classList.remove('rotate-180');
+                    profileMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
     </script>
 </body>
 </html>

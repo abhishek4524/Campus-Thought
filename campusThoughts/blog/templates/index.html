@@ -8,32 +8,37 @@
         
         <!-- Category & Sorting Pills Navigation -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800/60">
-            <div class="flex flex-wrap gap-2">
-                <a href="{% url 'home' %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if not selected_category %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide whitespace-nowrap snap-x" style="scrollbar-width: none; -ms-overflow-style: none;">
+                <style>
+                    .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
+                    }
+                </style>
+                <a href="{% url 'home' %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if not selected_category %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     All Thoughts
                 </a>
-                <a href="{% url 'home' %}?category=Programming{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Programming' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Programming{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Programming' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Programming
                 </a>
-                <a href="{% url 'home' %}?category=Lifestyle{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Lifestyle' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Lifestyle{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Lifestyle' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Lifestyle
                 </a>
-                <a href="{% url 'home' %}?category=Health{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Health' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Health{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Health' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Health
                 </a>
-                <a href="{% url 'home' %}?category=Family{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Family' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Family{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Family' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Family
                 </a>
-                <a href="{% url 'home' %}?category=Management{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Management' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Management{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Management' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Management
                 </a>
-                <a href="{% url 'home' %}?category=Travel{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Travel' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Travel{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Travel' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Travel
                 </a>
-                <a href="{% url 'home' %}?category=Work{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Work' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Work{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Work' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Work
                 </a>
-                <a href="{% url 'home' %}?category=Other{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Other' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
+                <a href="{% url 'home' %}?category=Other{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="snap-start px-4 py-2 rounded-full text-xs font-semibold transition {% if selected_category == 'Other' %}bg-blue-600 text-white{% else %}bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800{% endif %}">
                     Other
                 </a>
             </div>

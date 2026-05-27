@@ -4,11 +4,12 @@ from django.utils.html import strip_tags
 from django.utils.text import slugify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from cloudinary.models import CloudinaryField
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    banner = models.ImageField(upload_to='banners/', blank=True, null=True)
+    avatar = CloudinaryField('image', blank=True, null=True)
+    banner = CloudinaryField('image', blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True)
     website = models.URLField(blank=True, null=True)
     github = models.URLField(blank=True, null=True)
@@ -37,7 +38,7 @@ class Post(models.Model):
     text = models.CharField(max_length=150)  # Replaces 'title' to maintain backward compatibility
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    photo = models.ImageField(upload_to='photos/', blank=True, null=True)
+    photo = CloudinaryField('image', blank=True, null=True)
     category = models.CharField(max_length=11, choices=BLOG_TYPE_CHOICE, default='Programming')
     is_draft = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
@@ -139,7 +140,7 @@ class Notification(models.Model):
 
 class SiteSetting(models.Model):
     site_title = models.CharField(max_length=100, default='Campus Thoughts')
-    site_logo = models.ImageField(upload_to='logo/', blank=True, null=True)
+    site_logo = CloudinaryField('image', blank=True, null=True)
     footer_text = models.CharField(max_length=200, default='© 2026 Campus Thoughts. All rights reserved.')
     maintenance_mode = models.BooleanField(default=False)
     theme_primary_color = models.CharField(max_length=7, default='#3b82f6')
