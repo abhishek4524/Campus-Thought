@@ -6,71 +6,86 @@
 
 {% block extra_head %}
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    .editor-shell {
-        background: rgba(255,255,255,.82);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(148,163,184,.15);
-        box-shadow: 0 40px 120px rgba(15,23,42,.08);
-    }
-    .editor-toolbar .ql-picker .ql-picker-label,
-    .editor-toolbar .ql-picker .ql-picker-item,
-    .editor-toolbar button,
-    .editor-toolbar select {
-        border-radius: 9999px;
-    }
-    .editor-toolbar .ql-stroke {
-        stroke: #334155;
-    }
-    .editor-toolbar .ql-picker-label,
-    .editor-toolbar .ql-toolbar button,
-    .editor-toolbar .ql-toolbar select {
-        transition: all .2s ease;
-    }
-    .ql-container {
-        border: 0 !important;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 1rem;
-        line-height: 1.75;
-    }
-    .ql-editor {
-        min-height: 420px;
-        padding: 1.5rem 1.25rem;
-        color: #0f172a;
-        background: transparent;
-    }
-    .dark .ql-editor {
-        color: #e2e8f0;
-    }
-    .ql-editor p {
-        margin: 0 0 1.15rem;
-    }
-    .ql-editor h1,
-    .ql-editor h2,
-    .ql-editor h3 {
-        margin: 1.35rem 0 .75rem;
-        font-weight: 700;
-    }
-    .image-drop-zone {
-        border: 2px dashed rgba(96,165,250,.65);
-        background: linear-gradient(180deg, rgba(236,240,255,.95), rgba(255,255,255,.72));
-    }
-    .image-drop-zone:hover {
-        background: linear-gradient(180deg, rgba(224,231,255,.95), rgba(255,255,255,.9));
-    }
-    .image-preview img {
-        max-height: 320px;
-        width: 100%;
-        object-fit: cover;
-        border-radius: 1.5rem;
-    }
-    .glass-panel {
-        background: rgba(15,23,42,.8);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(148,163,184,.18);
-    }
+  .editor-shell {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    box-shadow: 0 40px 120px rgba(15, 23, 42, 0.08);
+  }
+  .editor-toolbar .ql-picker .ql-picker-label,
+  .editor-toolbar .ql-picker .ql-picker-item,
+  .editor-toolbar button,
+  .editor-toolbar select {
+    border-radius: 9999px;
+  }
+  .editor-toolbar .ql-stroke {
+    stroke: #334155;
+  }
+  .editor-toolbar .ql-picker-label,
+  .editor-toolbar .ql-toolbar button,
+  .editor-toolbar .ql-toolbar select {
+    transition: all 0.2s ease;
+  }
+  .ql-container {
+    border: 0 !important;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .ql-editor {
+    min-height: 420px;
+    padding: 1.5rem 1.25rem;
+    color: #0f172a;
+    background: transparent;
+  }
+  .dark .ql-editor {
+    color: #e2e8f0;
+  }
+  .ql-editor p {
+    margin: 0 0 1.15rem;
+  }
+  .ql-editor h1,
+  .ql-editor h2,
+  .ql-editor h3 {
+    margin: 1.35rem 0 0.75rem;
+    font-weight: 700;
+  }
+  .image-drop-zone {
+    border: 2px dashed rgba(96, 165, 250, 0.65);
+    background: linear-gradient(180deg, rgba(236, 240, 255, 0.95), rgba(255, 255, 255, 0.72));
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .image-drop-zone.drag-over {
+    border-color: #3b82f6;
+    background: linear-gradient(180deg, rgba(219, 234, 254, 0.95), rgba(255, 255, 255, 0.9));
+    transform: scale(0.98);
+  }
+  .image-drop-zone:hover {
+    background: linear-gradient(180deg, rgba(224, 231, 255, 0.95), rgba(255, 255, 255, 0.9));
+    border-color: #60a5fa;
+  }
+  .image-preview img {
+    max-height: 320px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 1.5rem;
+  }
+  .glass-panel {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+  }
+  .hidden {
+    display: none !important;
+  }
+  .transition {
+    transition: all 0.2s ease;
+  }
 </style>
 {% endblock %}
 
@@ -80,384 +95,695 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="sticky top-24 z-20 mb-6 rounded-3xl glassmorphic border border-slate-200/60 dark:border-slate-800/60 shadow-xl px-5 py-4 backdrop-blur-sm transition">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div class="space-y-2">
-                <p class="text-xs uppercase tracking-[0.32em] text-slate-400">Campus Thoughts Editor</p>
-                <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                    {% if post %}Edit your story{% else %}Publish a premium campus article{% endif %}
-                </h1>
-                <p class="max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">Write with confidence, manage your SEO, and save drafts automatically as you build your narrative.</p>
-            </div>
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3">
-                    <span class="block text-[11px] uppercase tracking-[0.4em] text-slate-400">Word Count</span>
-                    <span id="word-count" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">0</span>
-                </div>
-                <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3">
-                    <span class="block text-[11px] uppercase tracking-[0.4em] text-slate-400">Read Time</span>
-                    <span id="reading-time" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">1 min read</span>
-                </div>
-                <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3">
-                    <span class="block text-[11px] uppercase tracking-[0.4em] text-slate-400">Draft Status</span>
-                    <span id="save-status" class="mt-2 text-xl font-semibold text-emerald-600 dark:text-emerald-400">Ready to write</span>
-                </div>
-            </div>
+  <div
+    class="sticky top-24 z-20 mb-6 rounded-3xl glassmorphic border border-slate-200/60 dark:border-slate-800/60 shadow-xl px-5 py-4 backdrop-blur-sm transition"
+  >
+    <div
+      class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div class="space-y-2">
+        <p class="text-xs uppercase tracking-[0.32em] text-slate-400">
+          Campus Thoughts Editor
+        </p>
+        <h1
+          class="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+        >
+          {% if post %}Edit your story{% else %}Publish a premium campus
+          article{% endif %}
+        </h1>
+        <p
+          class="max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400"
+        >
+          Write with confidence, manage your SEO, and save drafts automatically
+          as you build your narrative.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div
+          class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3"
+        >
+          <span
+            class="block text-[11px] uppercase tracking-[0.4em] text-slate-400"
+            >Word Count</span
+          >
+          <span
+            id="word-count"
+            class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100"
+            >0</span
+          >
         </div>
+        <div
+          class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3"
+        >
+          <span
+            class="block text-[11px] uppercase tracking-[0.4em] text-slate-400"
+            >Read Time</span
+          >
+          <span
+            id="reading-time"
+            class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100"
+            >1 min read</span
+          >
+        </div>
+        <div
+          class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/85 dark:bg-slate-950/75 px-4 py-3"
+        >
+          <span
+            class="block text-[11px] uppercase tracking-[0.4em] text-slate-400"
+            >Draft Status</span
+          >
+          <span
+            id="save-status"
+            class="mt-2 text-xl font-semibold text-emerald-600 dark:text-emerald-400"
+            >Ready to write</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form
+    id="post-editor-form"
+    method="POST"
+    enctype="multipart/form-data"
+    class="space-y-8"
+  >
+    {% csrf_token %} 
+    {% if post %}<input type="hidden" name="post_id" id="post-id" value="{{ post.id }}">{% endif %}
+    
+    <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+      <div class="space-y-8">
+        {% if form.errors %}
+        <div
+          class="rounded-3xl border border-red-200/80 bg-red-50/80 p-4 text-sm text-red-700 dark:border-red-800/60 dark:bg-red-950/20 dark:text-red-300"
+        >
+          <strong class="block mb-2">Please fix these items before saving:</strong>
+          {{ form.non_field_errors }} 
+          {% for field in form %} 
+            {% if field.errors %}
+              <p><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</p>
+            {% endif %} 
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="rounded-[2rem] editor-shell overflow-hidden">
+          <div class="flex flex-col gap-4 p-6 sm:p-8">
+            <div class="space-y-4">
+              <label
+                for="id_text"
+                class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400"
+                >Post Title</label
+              >
+              {{ form.text }}
+              <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-500 dark:text-slate-400"
+              >
+                <span>Maximum 150 characters</span>
+                <span
+                  id="title-count"
+                  class="font-semibold text-slate-700 dark:text-slate-200"
+                  >0 / 150</span
+                >
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div class="space-y-3">
+                <label
+                  class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400"
+                  >Category</label
+                >
+                {{ form.category }}
+              </div>
+              <label
+                class="group flex items-center gap-3 rounded-3xl border border-slate-200/80 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950/70 p-4 transition hover:border-blue-400/40 cursor-pointer"
+              >
+                {{ form.is_draft }}
+                <div>
+                  <span
+                    class="block text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >Save as Draft</span
+                  >
+                  <span class="text-xs text-slate-500 dark:text-slate-400"
+                    >Keep work private until you're ready.</span
+                  >
+                </div>
+              </label>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                    Cover Image
+                  </h3>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    Drag, drop, or browse for a hero image.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  id="photo-upload-button"
+                  class="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:scale-[1.02] transition"
+                >
+                  <i class="fas fa-cloud-upload-alt mr-2"></i>Choose Image
+                </button>
+              </div>
+              
+              {{ form.photo }}
+
+              <div
+                id="image-drop-zone"
+                class="group relative overflow-hidden rounded-[2rem] border-2 border-dashed border-blue-300 bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 p-10 text-center transition hover:border-blue-500 hover:shadow-2xl cursor-pointer"
+              >
+                <div class="space-y-4">
+                  <div
+                    class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950/40"
+                  >
+                    <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xl font-bold text-slate-900 dark:text-white">
+                      Drop a cover image here
+                    </h4>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                      JPEG, PNG, WEBP • Max 6 MB
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    id="browse-image-button"
+                    class="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    <i class="fas fa-folder-open mr-2"></i>Browse Files
+                  </button>
+                </div>
+              </div>
+
+              <div
+                id="image-preview"
+                class="hidden overflow-hidden rounded-[2rem] border border-slate-200 bg-black shadow-2xl"
+              >
+                <img
+                  id="cover-preview-img"
+                  src=""
+                  alt="Preview"
+                  class="h-[320px] w-full object-cover"
+                />
+                <div class="flex items-center justify-between bg-slate-950 px-5 py-4">
+                  <div>
+                    <p class="text-sm font-semibold text-white">
+                      <i class="fas fa-check-circle text-green-500 mr-2"></i>Cover image selected
+                    </p>
+                    <p id="image-file-name" class="text-xs text-slate-400 mt-1"></p>
+                  </div>
+                  <button
+                    type="button"
+                    id="remove-photo-button"
+                    class="rounded-full bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/20 transition"
+                  >
+                    <i class="fas fa-trash mr-2"></i>Remove
+                  </button>
+                </div>
+              </div>
+              
+              {% if post and post.photo %}
+              <div id="existing-photo" class="rounded-[2rem] overflow-hidden border border-slate-200 bg-white dark:bg-slate-800">
+                <img src="{{ post.photo.url }}" alt="Current cover" class="h-[200px] w-full object-cover">
+                <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900">
+                  <p class="text-sm text-slate-600 dark:text-slate-400">
+                    <i class="fas fa-image text-blue-500 mr-2"></i>Current cover image
+                  </p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="space-y-4">
+              <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400"
+                  >
+                    Story body
+                  </p>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    Use commands or shortcuts to format headlines, lists,
+                    quotes, and code.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  id="toggle-focus-mode"
+                  class="rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-sm hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition"
+                >
+                  <i class="fas fa-expand mr-2"></i>Toggle focus mode
+                </button>
+              </div>
+              <div
+                id="editor-toolbar"
+                class="editor-toolbar rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-3 shadow-sm"
+              ></div>
+              <div
+                id="quill-editor"
+                class="rounded-[1.75rem] border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-950 shadow-sm"
+              ></div>
+              {{ form.description }}
+            </div>
+
+            <div
+              class="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <div class="space-y-1">
+                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">
+                  SEO Title
+                </p>
+                <p
+                  id="seo-title-length"
+                  class="text-sm font-semibold text-slate-900 dark:text-slate-100"
+                >
+                  0 / 140
+                </p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">
+                  Meta description
+                </p>
+                <p
+                  id="seo-description-count"
+                  class="text-sm font-semibold text-slate-900 dark:text-slate-100"
+                >
+                  0 / 160
+                </p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">
+                  Google preview
+                </p>
+                <p
+                  id="google-preview"
+                  class="text-sm text-slate-500 dark:text-slate-400"
+                >
+                  Live preview will update as you type.
+                </p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">
+                  Slug preview
+                </p>
+                <p
+                  id="slug-preview"
+                  class="text-sm font-semibold text-slate-900 dark:text-slate-100"
+                >
+                  ---
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="space-y-6">
+        <section class="rounded-[2rem] glass-panel p-6 text-slate-100">
+          <h2 class="text-base font-semibold">Publishing controls</h2>
+          <div class="mt-4 space-y-4 text-sm text-slate-300">
+            <p><strong>Auto-save:</strong> every 30 seconds while active.</p>
+            <p><strong>Draft mode:</strong> keep work private until ready.</p>
+            <p>
+              <strong>SEO scoring:</strong> keep your title under 60 chars and
+              descriptions near 155 chars.
+            </p>
+          </div>
+        </section>
+
+        <section
+          class="rounded-[2rem] border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-6 shadow-sm"
+        >
+          <h2
+            class="text-sm font-semibold uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400"
+          >
+            Live status
+          </h2>
+          <div class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+            <div class="rounded-3xl bg-slate-100 dark:bg-slate-900 p-4">
+              <span class="block text-slate-500 dark:text-slate-400"
+                >Progress toward publication</span
+              >
+              <div class="mt-3 h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                <div
+                  id="story-progress"
+                  class="h-full w-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
+                ></div>
+              </div>
+            </div>
+            <div class="rounded-3xl bg-slate-100 dark:bg-slate-900 p-4">
+              <span class="block text-slate-500 dark:text-slate-400"
+                >Last autosave</span
+              >
+              <span
+                id="last-saved"
+                class="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100"
+                >Not saved yet</span
+              >
+            </div>
+          </div>
+        </section>
+      </aside>
     </div>
 
-    <form id="post-editor-form" method="POST" enctype="multipart/form-data" class="space-y-8">
-        {% csrf_token %}
-        {% if post %}<input type="hidden" name="post_id" id="post-id" value="{{ post.id }}">{% endif %}
-        <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
-            <div class="space-y-8">
-                {% if form.errors %}
-                <div class="rounded-3xl border border-red-200/80 bg-red-50/80 p-4 text-sm text-red-700 dark:border-red-800/60 dark:bg-red-950/20 dark:text-red-300">
-                    <strong class="block mb-2">Please fix these items before saving:</strong>
-                    {{ form.non_field_errors }}
-                    {% for field in form %}
-                        {% if field.errors %}
-                            <p><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</p>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <section class="rounded-[2rem] editor-shell overflow-hidden">
-                    <div class="flex flex-col gap-4 p-6 sm:p-8">
-                        <div class="space-y-4">
-                            <label for="id_text" class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Post Title</label>
-                            {{ form.text }}
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
-                                <span>Maximum 150 characters</span>
-                                <span id="title-count" class="font-semibold text-slate-700 dark:text-slate-200">0 / 150</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div class="space-y-3">
-                                <label class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Category</label>
-                                {{ form.category }}
-                            </div>
-                            <label class="group flex items-center gap-3 rounded-3xl border border-slate-200/80 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950/70 p-4 transition hover:border-blue-400/40">
-                                {{ form.is_draft }}
-                                <div>
-                                    <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Save as Draft</span>
-                                    <span class="text-xs text-slate-500 dark:text-slate-400">Keep work private until you're ready.</span>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <p class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Cover image</p>
-                                    <p class="text-xs text-slate-400 dark:text-slate-500">Drag, drop, or browse for a hero image.</p>
-                                </div>
-                                <button type="button" id="photo-upload-button" class="rounded-full bg-slate-900 text-white px-4 py-2 text-sm shadow-lg shadow-slate-900/10 transition hover:bg-slate-800">Choose image</button>
-                            </div>
-                            <div id="image-drop-zone" class="image-drop-zone rounded-[1.75rem] p-8 text-center transition">
-                                <div class="mx-auto max-w-xl space-y-4">
-                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-600"></i>
-                                    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Drop a cover image here</p>
-                                    <p class="text-sm text-slate-500 dark:text-slate-400">JPEG/PNG/WEBP formats, up to 6 MB.</p>
-                                </div>
-                                {{ form.photo }}
-                            </div>
-                            <div id="image-preview" class="image-preview hidden rounded-[1.75rem] overflow-hidden border border-slate-200 dark:border-slate-800">
-                                <img src="" alt="Cover preview" id="cover-preview-img">
-                                <div class="flex items-center justify-between bg-slate-950/80 px-4 py-3 text-white">
-                                    <span class="text-sm">Selected cover image</span>
-                                    <button type="button" id="remove-photo-button" class="text-sm text-slate-200 hover:text-white">Remove</button>
-                                </div>
-                            </div>
-                            {% if post and post.photo %}
-                            <div id="existing-photo" class="image-preview rounded-[1.75rem] overflow-hidden border border-slate-200 dark:border-slate-800">
-                                <img src="{{ post.photo.url }}" alt="Current cover image">
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <p class="text-sm uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Story body</p>
-                                    <p class="text-sm text-slate-500 dark:text-slate-400">Use commands or shortcuts to format headlines, lists, quotes, and code.</p>
-                                </div>
-                                <button type="button" id="toggle-focus-mode" class="rounded-full bg-slate-100 text-slate-700 px-4 py-2 text-sm hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition">Toggle focus mode</button>
-                            </div>
-                            <div id="editor-toolbar" class="editor-toolbar rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-3 shadow-sm"></div>
-                            <div id="quill-editor" class="rounded-[1.75rem] border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-950 shadow-sm"></div>
-                        </div>
-
-                        <div class="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <div class="space-y-1">
-                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">SEO Title</p>
-                                <p id="seo-title-length" class="text-sm font-semibold text-slate-900 dark:text-slate-100">0 / 140</p>
-                            </div>
-                            <div class="space-y-1">
-                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">Meta description</p>
-                                <p id="seo-description-count" class="text-sm font-semibold text-slate-900 dark:text-slate-100">0 / 160</p>
-                            </div>
-                            <div class="space-y-1">
-                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">Google preview</p>
-                                <p id="google-preview" class="text-sm text-slate-500 dark:text-slate-400">Live preview will update as you type.</p>
-                            </div>
-                            <div class="space-y-1">
-                                <p class="text-[11px] uppercase tracking-[0.36em] text-slate-400">Slug preview</p>
-                                <p id="slug-preview" class="text-sm font-semibold text-slate-900 dark:text-slate-100">---</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <aside class="space-y-6">
-                <section class="rounded-[2rem] glass-panel p-6 text-slate-100">
-                    <h2 class="text-base font-semibold">Publishing controls</h2>
-                    <div class="mt-4 space-y-4 text-sm text-slate-300">
-                        <p><strong>Auto-save:</strong> every 30 seconds while active.</p>
-                        <p><strong>Draft mode:</strong> keep work private until ready.</p>
-                        <p><strong>SEO scoring:</strong> keep your title under 60 chars and descriptions near 155 chars.</p>
-                    </div>
-                </section>
-
-                <section class="rounded-[2rem] border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-6 shadow-sm">
-                    <h2 class="text-sm font-semibold uppercase tracking-[0.32em] text-slate-500 dark:text-slate-400">Live status</h2>
-                    <div class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
-                        <div class="rounded-3xl bg-slate-100 dark:bg-slate-900 p-4">
-                            <span class="block text-slate-500 dark:text-slate-400">Progress toward publication</span>
-                            <div class="mt-3 h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                                <div id="story-progress" class="h-full w-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"></div>
-                            </div>
-                        </div>
-                        <div class="rounded-3xl bg-slate-100 dark:bg-slate-900 p-4">
-                            <span class="block text-slate-500 dark:text-slate-400">Last autosave</span>
-                            <span id="last-saved" class="mt-1 block text-sm font-medium text-slate-900 dark:text-slate-100">Not saved yet</span>
-                        </div>
-                    </div>
-                </section>
-            </aside>
-        </div>
-
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
-                <p>Need inspiration? Write with clarity, format for readers, and publish with confidence.</p>
-            </div>
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <a href="{% url 'home' %}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">Cancel</a>
-                <button type="submit" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 text-sm font-semibold text-white shadow-2xl shadow-blue-500/10 transition hover:scale-[1.01]">Save & Publish</button>
-            </div>
-        </div>
-    </form>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+        <p>
+          Need inspiration? Write with clarity, format for readers, and publish
+          with confidence.
+        </p>
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <a
+          href="{% url 'home' %}"
+          class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+        >
+          <i class="fas fa-times mr-2"></i>Cancel
+        </a>
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 text-sm font-semibold text-white shadow-2xl shadow-blue-500/10 transition hover:scale-[1.01]"
+        >
+          <i class="fas fa-paper-plane mr-2"></i>Save & Publish
+        </button>
+      </div>
+    </div>
+  </form>
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
     const autosaveEndpoint = '{{ autosave_endpoint|default:"" }}';
-    const form = document.getElementById('post-editor-form');
-    const titleInput = document.getElementById('id_text');
-    const seoTitleInput = document.getElementById('id_seo_title');
-    const seoDescriptionInput = document.getElementById('id_seo_description');
-    const editorContent = document.getElementById('editor-content');
-    const wordCountEl = document.getElementById('word-count');
-    const readingTimeEl = document.getElementById('reading-time');
-    const titleCountEl = document.getElementById('title-count');
-    const seoTitleLengthEl = document.getElementById('seo-title-length');
-    const seoDescriptionCountEl = document.getElementById('seo-description-count');
-    const slugPreview = document.getElementById('slug-preview');
-    const googlePreview = document.getElementById('google-preview');
-    const saveStatus = document.getElementById('save-status');
-    const lastSaved = document.getElementById('last-saved');
-    const storyProgress = document.getElementById('story-progress');
-    const focusToggle = document.getElementById('toggle-focus-mode');
-    const dropZone = document.getElementById('image-drop-zone');
-    const uploadInput = document.getElementById('photo-upload-input');
-    const uploadButton = document.getElementById('photo-upload-button');
-    const imagePreviewSection = document.getElementById('image-preview');
-    const coverPreviewImage = document.getElementById('cover-preview-img');
-    const removePhotoButton = document.getElementById('remove-photo-button');
+    const form = document.getElementById("post-editor-form");
+    const titleInput = document.getElementById("id_text");
+    const seoTitleInput = document.getElementById("id_seo_title");
+    const seoDescriptionInput = document.getElementById("id_seo_description");
+    const editorContent = document.getElementById("editor-content");
+    const wordCountEl = document.getElementById("word-count");
+    const readingTimeEl = document.getElementById("reading-time");
+    const titleCountEl = document.getElementById("title-count");
+    const seoTitleLengthEl = document.getElementById("seo-title-length");
+    const seoDescriptionCountEl = document.getElementById("seo-description-count");
+    const slugPreview = document.getElementById("slug-preview");
+    const googlePreview = document.getElementById("google-preview");
+    const saveStatus = document.getElementById("save-status");
+    const lastSaved = document.getElementById("last-saved");
+    const storyProgress = document.getElementById("story-progress");
+    const focusToggle = document.getElementById("toggle-focus-mode");
+    const dropZone = document.getElementById("image-drop-zone");
+    const uploadInput = document.getElementById("photo-upload-input");
+    const uploadButton = document.getElementById("photo-upload-button");
+    const imagePreviewSection = document.getElementById("image-preview");
+    const coverPreviewImage = document.getElementById("cover-preview-img");
+    const removePhotoButton = document.getElementById("remove-photo-button");
+    const browseButton = document.getElementById("browse-image-button");
     let isDirty = false;
     let autosaveTimer = null;
 
     function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.startsWith(name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
         }
-        return cookieValue;
+      }
+      return cookieValue;
     }
 
     function slugifyText(value) {
-        return value.toString().toLowerCase().trim()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+      return value
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     }
 
-    const quill = new Quill('#quill-editor', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                [{ header: [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                ['blockquote', 'code-block'],
-                ['link'],
-                [{ color: [] }, { background: [] }],
-                ['clean']
-            ],
-            keyboard: {
-                bindings: {
-                    bold: { key: 'B', shortKey: true },
-                    italic: { key: 'I', shortKey: true },
-                    underline: { key: 'U', shortKey: true }
-                }
-            }
+    // Initialize Quill editor
+    const quill = new Quill("#quill-editor", {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ["bold", "italic", "underline", "strike"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["blockquote", "code-block"],
+          ["link"],
+          [{ color: [] }, { background: [] }],
+          ["clean"],
+        ],
+        keyboard: {
+          bindings: {
+            bold: { key: "B", shortKey: true },
+            italic: { key: "I", shortKey: true },
+            underline: { key: "U", shortKey: true },
+          },
         },
-        placeholder: 'Write your story, insert emojis, and publish your best campus insight.',
+      },
+      placeholder: "Write your story, insert emojis, and publish your best campus insight.",
     });
+
+    // Set existing content if editing
+    if (editorContent.value) {
+      quill.root.innerHTML = editorContent.value;
+    }
 
     function updateEditorState() {
-        const html = quill.root.innerHTML.trim();
-        editorContent.value = html === '<p><br></p>' ? '' : html;
+      const html = quill.root.innerHTML.trim();
+      editorContent.value = html === "<p><br></p>" ? "" : html;
 
-        const text = quill.getText().trim();
-        const wordCount = text ? text.split(/\s+/).length : 0;
-        wordCountEl.textContent = wordCount;
-        readingTimeEl.textContent = `${Math.max(1, Math.round(wordCount / 200))} min read`;
-        titleCountEl.textContent = `${titleInput.value.length} / 150`;
-        seoTitleLengthEl.textContent = `${(seoTitleInput.value || titleInput.value).length} / 140`;
-        seoDescriptionCountEl.textContent = `${seoDescriptionInput.value.length} / 160`;
+      const text = quill.getText().trim();
+      const wordCount = text ? text.split(/\s+/).length : 0;
+      wordCountEl.textContent = wordCount;
+      readingTimeEl.textContent = `${Math.max(1, Math.round(wordCount / 200))} min read`;
+      titleCountEl.textContent = `${titleInput.value.length} / 150`;
+      seoTitleLengthEl.textContent = `${(seoTitleInput?.value || titleInput.value).length} / 140`;
+      seoDescriptionCountEl.textContent = `${seoDescriptionInput?.value.length || 0} / 160`;
 
-        const titleText = seoTitleInput.value.trim() || titleInput.value.trim();
-        googlePreview.textContent = titleText ? titleText : 'SEO preview will appear here';
-        slugPreview.textContent = titleInput.value ? slugifyText(titleInput.value) : '---';
+      const titleText = (seoTitleInput?.value.trim() || titleInput.value.trim());
+      googlePreview.textContent = titleText ? titleText : "SEO preview will appear here";
+      slugPreview.textContent = titleInput.value ? slugifyText(titleInput.value) : "---";
 
-        const progress = Math.min(100, Math.round((wordCount / 750) * 100));
-        storyProgress.style.width = `${progress}%`;
-        storyProgress.setAttribute('aria-valuenow', progress);
+      const progress = Math.min(100, Math.round((wordCount / 750) * 100));
+      storyProgress.style.width = `${progress}%`;
 
-        isDirty = true;
+      isDirty = true;
     }
 
-    quill.on('text-change', () => {
-        updateEditorState();
-        saveStatus.textContent = 'Unsaved changes';
-        saveStatus.classList.remove('text-emerald-600');
-        saveStatus.classList.add('text-amber-500');
+    quill.on("text-change", () => {
+      updateEditorState();
+      saveStatus.textContent = "Unsaved changes";
+      saveStatus.classList.remove("text-emerald-600");
+      saveStatus.classList.add("text-amber-500");
     });
 
-    titleInput.addEventListener('input', updateEditorState);
-    seoTitleInput.addEventListener('input', updateEditorState);
-    seoDescriptionInput.addEventListener('input', updateEditorState);
+    if (titleInput) titleInput.addEventListener("input", updateEditorState);
+    if (seoTitleInput) seoTitleInput.addEventListener("input", updateEditorState);
+    if (seoDescriptionInput) seoDescriptionInput.addEventListener("input", updateEditorState);
 
+    // Handle image file selection
     function handleFile(file) {
-        if (!file) return;
-        if (!['image/jpeg', 'image/png', 'image/webp', 'image/pjpeg'].includes(file.type)) {
-            alert('Only JPEG, PNG, and WEBP images are supported.');
-            return;
+      if (!file) return;
+
+      const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+      if (!validTypes.includes(file.type)) {
+        alert("❌ Only JPG, PNG, and WEBP images are allowed.");
+        return false;
+      }
+
+      if (file.size > 6 * 1024 * 1024) {
+        alert("❌ Image size must be under 6MB.");
+        return false;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        coverPreviewImage.src = e.target.result;
+        imagePreviewSection.classList.remove("hidden");
+        document.getElementById("image-file-name").textContent = file.name;
+        dropZone.classList.add("hidden");
+        
+        const existingPhoto = document.getElementById("existing-photo");
+        if (existingPhoto) {
+          existingPhoto.classList.add("hidden");
         }
-        if (file.size > 6 * 1024 * 1024) {
-            alert('Image size must be 6 MB or less.');
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            coverPreviewImage.src = event.target.result;
-            imagePreviewSection.classList.remove('hidden');
-            const existing = document.getElementById('existing-photo');
-            if (existing) {
-                existing.classList.add('hidden');
-            }
-        };
-        reader.readAsDataURL(file);
+        
+        // Create a FileTransfer to update the file input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        uploadInput.files = dataTransfer.files;
+        
+        isDirty = true;
+        saveStatus.textContent = "Unsaved changes";
+        saveStatus.classList.remove("text-emerald-600");
+        saveStatus.classList.add("text-amber-500");
+      };
+      reader.readAsDataURL(file);
+      return true;
     }
 
-    uploadButton.addEventListener('click', () => uploadInput.click());
-    uploadInput.addEventListener('change', () => handleFile(uploadInput.files[0]));
+    // Open file picker
+    function openFilePicker(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadInput.click();
+    }
 
-    dropZone.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        dropZone.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
-    });
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
-    });
-    dropZone.addEventListener('drop', (event) => {
-        event.preventDefault();
-        dropZone.classList.remove('ring-2', 'ring-blue-400', 'ring-offset-2');
-        const file = event.dataTransfer.files[0];
-        if (file) {
-            uploadInput.files = event.dataTransfer.files;
-            handleFile(file);
+    // Event listeners for image upload
+    if (uploadButton) {
+      uploadButton.addEventListener("click", openFilePicker);
+    }
+    
+    if (browseButton) {
+      browseButton.addEventListener("click", openFilePicker);
+    }
+    
+    if (uploadInput) {
+      uploadInput.addEventListener("change", function(e) {
+        if (uploadInput.files && uploadInput.files[0]) {
+          handleFile(uploadInput.files[0]);
         }
-    });
+      });
+    }
+    
+    // Drop zone click handling
+    if (dropZone) {
+      dropZone.addEventListener("click", function(e) {
+        if (e.target.closest("#browse-image-button")) {
+          return;
+        }
+        uploadInput.click();
+      });
+      
+      // Drag and drop handlers
+      dropZone.addEventListener("dragover", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add("drag-over");
+      });
+      
+      dropZone.addEventListener("dragleave", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("drag-over");
+      });
+      
+      dropZone.addEventListener("drop", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("drag-over");
+        
+        const files = e.dataTransfer.files;
+        if (files && files[0]) {
+          handleFile(files[0]);
+        }
+      });
+    }
+    
+    // Remove photo button
+    if (removePhotoButton) {
+      removePhotoButton.addEventListener("click", function() {
+        uploadInput.value = "";
+        imagePreviewSection.classList.add("hidden");
+        dropZone.classList.remove("hidden");
+        coverPreviewImage.src = "";
+        
+        const existingPhoto = document.getElementById("existing-photo");
+        if (existingPhoto) {
+          existingPhoto.classList.remove("hidden");
+        }
+        
+        isDirty = true;
+        saveStatus.textContent = "Unsaved changes";
+        saveStatus.classList.remove("text-emerald-600");
+        saveStatus.classList.add("text-amber-500");
+      });
+    }
 
-    removePhotoButton.addEventListener('click', () => {
-        uploadInput.value = '';
-        coverPreviewImage.src = '';
-        imagePreviewSection.classList.add('hidden');
-    });
+    // Focus mode toggle
+    if (focusToggle) {
+      focusToggle.addEventListener("click", function() {
+        document.body.classList.toggle("overflow-hidden");
+        const editorShell = document.querySelector(".editor-shell");
+        if (editorShell) {
+          editorShell.classList.toggle("max-w-4xl");
+          editorShell.classList.toggle("mx-auto");
+        }
+      });
+    }
 
-    focusToggle.addEventListener('click', () => {
-        document.querySelector('body').classList.toggle('overflow-hidden');
-        document.querySelector('.editor-shell').classList.toggle('max-w-4xl');
-    });
-
+    // Auto-save function
     function autoSaveDraft() {
-        if (!isDirty || !autosaveEndpoint) return;
-        updateEditorState();
-        const payload = new FormData(form);
-        fetch(autosaveEndpoint, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: payload,
-            credentials: 'same-origin'
+      if (!isDirty || !autosaveEndpoint) return;
+      updateEditorState();
+      const payload = new FormData(form);
+      fetch(autosaveEndpoint, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: payload,
+        credentials: "same-origin",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            let hiddenField = document.getElementById("post-id");
+            if (!hiddenField) {
+              hiddenField = document.createElement("input");
+              hiddenField.type = "hidden";
+              hiddenField.name = "post_id";
+              hiddenField.id = "post-id";
+              form.appendChild(hiddenField);
+            }
+            if (data.post_id) {
+              hiddenField.value = data.post_id;
+              const url = new URL(window.location.href);
+              url.searchParams.set('post_id', data.post_id);
+              window.history.replaceState({}, '', url);
+            }
+            saveStatus.textContent = "Draft saved";
+            saveStatus.classList.remove("text-amber-500", "text-rose-500");
+            saveStatus.classList.add("text-emerald-600");
+            lastSaved.textContent = new Date().toLocaleTimeString();
+            isDirty = false;
+          } else {
+            saveStatus.textContent = "Save failed";
+            saveStatus.classList.remove("text-emerald-600");
+            saveStatus.classList.add("text-rose-500");
+          }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    let hiddenField = document.getElementById('post-id');
-                    if (!hiddenField) {
-                        hiddenField = document.createElement('input');
-                        hiddenField.type = 'hidden';
-                        hiddenField.name = 'post_id';
-                        hiddenField.id = 'post-id';
-                        form.appendChild(hiddenField);
-                    }
-                    hiddenField.value = data.post_id;
-                    saveStatus.textContent = 'Draft saved';
-                    saveStatus.classList.remove('text-amber-500', 'text-rose-500');
-                    saveStatus.classList.add('text-emerald-600');
-                    lastSaved.textContent = new Date().toLocaleString();
-                    isDirty = false;
-                } else {
-                    saveStatus.textContent = 'Save failed';
-                    saveStatus.classList.remove('text-emerald-600');
-                    saveStatus.classList.add('text-rose-500');
-                }
-            })
-            .catch(() => {
-                saveStatus.textContent = 'Auto-save error';
-                saveStatus.classList.remove('text-emerald-600');
-                saveStatus.classList.add('text-rose-500');
-            });
+        .catch(() => {
+          saveStatus.textContent = "Auto-save error";
+          saveStatus.classList.remove("text-emerald-600");
+          saveStatus.classList.add("text-rose-500");
+        });
     }
 
-    form.addEventListener('submit', () => {
-        updateEditorState();
+    form.addEventListener("submit", function() {
+      updateEditorState();
     });
 
-    autosaveTimer = setInterval(autoSaveDraft, 30000);
+    // Start auto-save interval
+    if (autosaveEndpoint) {
+      autosaveTimer = setInterval(autoSaveDraft, 30000);
+    }
+    
     updateEditorState();
+  });
 </script>
 {% endblock %}

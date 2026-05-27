@@ -58,9 +58,15 @@ class Post(models.Model):
             original_slug = slugify(self.text)
             unique_slug = original_slug
             num = 1
-            while Post.objects.filter(slug=unique_slug).exists():
+            qs = Post.objects.filter(slug=unique_slug)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            while qs.exists():
                 unique_slug = f'{original_slug}-{num}'
                 num += 1
+                qs = Post.objects.filter(slug=unique_slug)
+                if self.pk:
+                    qs = qs.exclude(pk=self.pk)
             self.slug = unique_slug
 
         if not self.seo_title and self.text:

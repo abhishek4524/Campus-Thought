@@ -129,7 +129,9 @@ class CustomLoginView(LoginView):
         return response
 
 def custom_logout(request):
-    logout(request)
+    if request.method == 'POST':
+        logout(request)
+        return redirect('home')
     return redirect('home')
 
 def register(request):
@@ -150,11 +152,22 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
     template_name = 'blog_form.html'
     success_url = reverse_lazy('home')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        post_id = self.request.POST.get('post_id') if self.request.method == 'POST' else self.request.GET.get('post_id')
+        if post_id:
+            draft_post = get_object_or_404(Post, pk=post_id, user=self.request.user)
+            kwargs['instance'] = draft_post
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Create Campus Thought'
         context['autosave_endpoint'] = reverse_lazy('blog_autosave')
         context['draft'] = None
+        post_id = self.request.POST.get('post_id') or self.request.GET.get('post_id')
+        if post_id:
+            context['post'] = get_object_or_404(Post, pk=post_id, user=self.request.user)
         return context
 
     def form_valid(self, form):
@@ -186,6 +199,9 @@ class BlogEditView(LoginRequiredMixin, UpdateView):
         context['autosave_endpoint'] = reverse_lazy('blog_autosave')
         return context
 
+    def get_success_url(self):
+        return reverse_lazy('full_blog', kwargs={'slug': self.object.slug})
+
     def form_valid(self, form):
         form.instance.is_draft = form.cleaned_data.get('is_draft', self.object.is_draft)
         if not form.instance.seo_title:
@@ -205,6 +221,8 @@ class BlogAutosaveView(LoginRequiredMixin, View):
             form = BlogForm(data, request.FILES)
 
         if not form.is_valid():
+            import sys
+            print(f'DEBUG autosave form invalid: {form.errors}', file=sys.stderr)
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
         draft = form.save(commit=False)
@@ -236,9 +254,12 @@ def blog_delete(request, post_id):
 def full_blog(request, slug):
     post = get_object_or_404(Post, slug=slug)
     
-    # Increment views count
-    post.views_count += 1
-    post.save(update_fields=['views_count'])
+    # Increment views count (session-based deduplication)
+    viewed_key = f'viewed_post_{post.id}'
+    if not request.session.get(viewed_key, False):
+        post.views_count += 1
+        post.save(update_fields=['views_count'])
+        request.session[viewed_key] = True
 
     if request.method == 'POST' and request.user.is_authenticated:
         form = CommentForm(request.POST)
@@ -515,24 +536,30 @@ def forgot_password(request):
         form = ForgotPasswordRequestForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            user = User.objects.get(email__iexact=email)
-            
-            # Rate limit OTP generation (prevent spamming: max 1 per 60 seconds)
-            one_minute_ago = timezone.now() - timezone.timedelta(seconds=60)
-            recent_otp = OTPVerification.objects.filter(user=user, created_at__gt=one_minute_ago)
-            if recent_otp.exists():
-                messages.error(request, "Please wait at least 60 seconds before requesting another recovery code.")
-                return render(request, 'registration/forgot_password.html', {'form': form})
-                
-            # Create OTP and send security email
-            otp_record = generate_secure_otp(user)
             try:
+                user = User.objects.get(email__iexact=email)
+                
+                # Rate limit OTP generation (prevent spamming: max 1 per 60 seconds)
+                one_minute_ago = timezone.now() - timezone.timedelta(seconds=60)
+                recent_otp = OTPVerification.objects.filter(user=user, created_at__gt=one_minute_ago)
+                if recent_otp.exists():
+                    messages.error(request, "Please wait at least 60 seconds before requesting another recovery code.")
+                    return render(request, 'registration/forgot_password.html', {'form': form})
+                    
+                # Create OTP and send security email
+                otp_record = generate_secure_otp(user)
                 send_secure_reset_email(user, otp_code=otp_record.otp_code)
-                request.session['reset_email'] = email
-                messages.success(request, "A secure 6-digit OTP verification code has been dispatched to your email address.")
-                return redirect('verify_otp')
+            except User.DoesNotExist:
+                # Do nothing if user doesn't exist to prevent enumeration
+                pass
             except Exception as e:
                 messages.error(request, f"An error occurred while sending the email: {str(e)}")
+                return render(request, 'registration/forgot_password.html', {'form': form})
+            
+            # Always show success and redirect, whether user exists or not
+            request.session['reset_email'] = email
+            messages.success(request, "A secure 6-digit OTP verification code has been dispatched to your email address.")
+            return redirect('verify_otp')
     else:
         form = ForgotPasswordRequestForm()
         

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="{% static 'images/favicon.ico' %}">
     <title>{% block title %}Campus Thoughts — Premium Blogging{% endblock %}</title>
     
     <!-- Tailwind CSS & FontAwesome -->
@@ -55,10 +56,11 @@
 
     <!-- Theme Initialization Script to prevent layout flash -->
     <script>
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        // Default to light theme unless user explicitly set 'dark' in localStorage.
+        if (localStorage.getItem('color-theme') === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
-            document.documentElement.classList.remove('dark')
+            document.documentElement.classList.remove('dark');
         }
     </script>
 
@@ -95,9 +97,11 @@
                         <!-- Notifications Bell Icon -->
                         <a href="{% url 'notifications_list' %}" class="p-2 sm:p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400 transition relative">
                             <i class="fa-solid fa-bell text-lg"></i>
+                            {% if unread_notifications_count %}
                             <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
-                                {{ user.notifications.all.count }}
+                                {{ unread_notifications_count }}
                             </span>
+                            {% endif %}
                         </a>
 
                         <!-- Quick Create -->
@@ -209,7 +213,7 @@
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
         // Change the icons inside the button based on previous settings
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('color-theme') === 'dark') {
             themeToggleLightIcon.classList.remove('hidden');
         } else {
             themeToggleDarkIcon.classList.remove('hidden');

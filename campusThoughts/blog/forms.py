@@ -16,6 +16,15 @@ class BlogForm(forms.ModelForm):
             'aria-hidden': 'true'
         })
     )
+    
+    photo = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'style': 'display: none',
+            'id': 'photo-upload-input',
+            'accept': 'image/png,image/jpeg,image/webp'
+        })
+    )
 
     class Meta:
         model = Post
@@ -43,10 +52,6 @@ class BlogForm(forms.ModelForm):
                 'rows': 4,
                 'maxlength': '160'
             }),
-            'photo': forms.ClearableFileInput(attrs={
-                'class': 'hidden',
-                'id': 'photo-upload-input'
-            })
         }
 
     def clean_text(self):
@@ -58,13 +63,15 @@ class BlogForm(forms.ModelForm):
         return text
 
     def clean_seo_title(self):
-        seo_title = self.cleaned_data.get('seo_title', '').strip()
+        seo_title = self.cleaned_data.get('seo_title') or ''
+        seo_title = seo_title.strip() if seo_title else ''
         if seo_title and len(seo_title) > 140:
             raise ValidationError('SEO title must be 140 characters or fewer.')
         return seo_title
 
     def clean_seo_description(self):
-        seo_description = self.cleaned_data.get('seo_description', '').strip()
+        seo_description = self.cleaned_data.get('seo_description') or ''
+        seo_description = seo_description.strip() if seo_description else ''
         if seo_description and len(seo_description) > 160:
             raise ValidationError('Meta description must be 160 characters or fewer.')
         return seo_description
@@ -150,8 +157,8 @@ class ForgotPasswordRequestForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if not User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError("No account is associated with this email address.")
+        # We purposely don't check if the email exists here to prevent enumeration attacks.
+        # The view handles sending the email if the user exists.
         return email
 
 class OTPVerificationForm(forms.Form):
