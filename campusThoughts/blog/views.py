@@ -296,11 +296,16 @@ def full_blog(request, slug):
     comments = post.comments.filter(parent=None, is_approved=True).order_by('-created_at')
     comment_count = post.comments.filter(is_approved=True).count()
 
+    is_following = False
+    if request.user.is_authenticated:
+        is_following = Follow.objects.filter(follower=request.user, following=post.user).exists()
+
     return render(request, 'full_blog.html', {
         'post': post,
         'comments': comments,
         'form': form,
-        'comment_count': comment_count
+        'comment_count': comment_count,
+        'is_following': is_following,
     })
 
 # User Profiles and Social Actions

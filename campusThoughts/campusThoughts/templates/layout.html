@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="{% static 'images/favicon.ico' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.ico' %}">
     <title>{% block title %}Campus Thoughts — Premium Blogging{% endblock %}</title>
     
     <!-- Tailwind CSS & FontAwesome -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     
     <!-- Google Fonts -->
@@ -49,6 +49,174 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
+        
+        /* Enhanced Swiper Styles */
+        .trending-swiper {
+            padding: 2rem 0 3rem !important;
+        }
+        .trending-swiper swiper-slide {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+        }
+        .trending-swiper swiper-slide:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.35);
+        }
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .trending-swiper swiper-slide:hover .slide-image {
+            transform: scale(1.08);
+        }
+        .slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, 
+                rgba(0, 0, 0, 0.85) 0%,
+                rgba(0, 0, 0, 0.5) 40%,
+                rgba(0, 0, 0, 0.2) 70%,
+                transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+        }
+        .trending-swiper swiper-slide:hover .slide-overlay {
+            background: linear-gradient(to top, 
+                rgba(0, 0, 0, 0.9) 0%,
+                rgba(0, 0, 0, 0.6) 45%,
+                rgba(0, 0, 0, 0.3) 75%,
+                transparent 100%);
+            padding-bottom: 2.2rem;
+        }
+        .slide-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border-radius: 100px;
+            padding: 0.25rem 1rem;
+            width: fit-content;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: white;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .slide-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            color: white;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .slide-description {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+        .slide-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .slide-meta i {
+            font-size: 0.65rem;
+            margin-right: 0.2rem;
+        }
+        
+        /* Custom Navigation Buttons */
+        .swiper-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            color: #1e293b;
+        }
+        .dark .swiper-nav-btn {
+            background: rgba(30, 41, 59, 0.95);
+            color: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .swiper-nav-btn:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .dark .swiper-nav-btn:hover {
+            background: #1e293b;
+        }
+        .swiper-nav-prev {
+            left: 0;
+        }
+        .swiper-nav-next {
+            right: 0;
+        }
+        
+        /* Pagination Styling */
+        .trending-swiper swiper-container::part(bullet) {
+            background: #94a3b8;
+            opacity: 0.6;
+            width: 8px;
+            height: 8px;
+            transition: all 0.2s;
+        }
+        .trending-swiper swiper-container::part(bullet-active) {
+            background: #3b82f6;
+            opacity: 1;
+            width: 24px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .slide-title {
+                font-size: 1rem;
+            }
+            .slide-description {
+                font-size: 0.7rem;
+                -webkit-line-clamp: 2;
+            }
+            .slide-overlay {
+                padding: 1rem;
+            }
+            .swiper-nav-btn {
+                width: 36px;
+                height: 36px;
+            }
+            .slide-category {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.75rem;
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -56,7 +224,6 @@
 
     <!-- Theme Initialization Script to prevent layout flash -->
     <script>
-        // Default to light theme unless user explicitly set 'dark' in localStorage.
         if (localStorage.getItem('color-theme') === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
@@ -67,7 +234,7 @@
     <!-- Top Navigation Bar -->
     <nav class="sticky top-0 z-40 glassmorphic border-b border-slate-200/50 dark:border-slate-800/50 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 sm:h-20">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
                 
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
@@ -79,14 +246,16 @@
                     </a>
                 </div>
 
-                <!-- Navigation Controls -->
-                <div class="flex items-center gap-2 sm:gap-4">
-                    
-                    <!-- Search Form Bar -->
-                    <form action="{% url 'search' %}" method="GET" class="hidden md:flex items-center relative">
-                        <input type="text" name="q" placeholder="Search articles, tags, authors..." class="w-64 px-4 py-2 pl-10 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-800 dark:text-slate-100">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 text-slate-400 text-sm"></i>
+                <!-- Centered Expandable Search Bar -->
+                <div class="hidden md:flex flex-grow max-w-2xl mx-6 lg:mx-12">
+                    <form action="{% url 'search' %}" method="GET" class="w-full relative">
+                        <input type="text" name="q" placeholder="Search articles, tags, authors..." class="w-full px-5 py-2.5 pl-11 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-800 dark:text-slate-100 shadow-sm focus:bg-white dark:focus:bg-slate-900">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     </form>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
 
                     <!-- Theme Toggle Button -->
                     <button id="theme-toggle" class="p-2 sm:p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400 transition" aria-label="Toggle Dark Mode">
@@ -170,48 +339,158 @@
         </div>
     </nav>
 
-    <!-- Swiper 3D coverflow slider for Campus Stories -->
-    {% block swiper %}
-    <div class="w-full bg-slate-100 dark:bg-slate-950 py-8 border-b border-slate-200/50 dark:border-slate-900/50">
-        <div class="max-w-7xl mx-auto px-4">
-            <h2 class="text-center text-xl font-bold font-outfit tracking-wide text-slate-400 dark:text-slate-500 uppercase mb-4">🏆 Trending Campus Life</h2>
-            <swiper-container class="mySwiper w-full" pagination="true" effect="coverflow" grab-cursor="true" centered-slides="true"
-                slides-per-view="auto" coverflow-effect-rotate="25" coverflow-effect-stretch="0" coverflow-effect-depth="150"
-                coverflow-effect-modifier="1.5" coverflow-effect-slide-shadows="true" style="padding: 20px 0 40px;">
-                <swiper-slide class="w-[280px] h-[340px] sm:w-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                    <img src="https://cdn.corenexis.com/files/c/9876336720.jpg" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Campus Life 1"/>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-                        <span class="text-white font-bold font-outfit text-lg">💡 Student Success Stories</span>
+    <!-- Enhanced Swiper Section - Premium Campus Stories -->
+{% block swiper %}
+<div class="w-full bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-950/90 py-12 border-b border-slate-200/50 dark:border-slate-900/50 overflow-hidden animate-fade-in">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <!-- Swiper Container with custom navigation slots -->
+        <div class="relative px-8 md:px-12">
+            <swiper-container class="campus-swiper w-full" 
+                init="false"
+                loop="true" 
+                effect="coverflow" 
+                grab-cursor="true" 
+                centered-slides="true"
+                slides-per-view="auto" 
+                coverflow-effect-rotate="25" 
+                coverflow-effect-stretch="0" 
+                coverflow-effect-depth="150"
+                coverflow-effect-modifier="1.5" 
+                coverflow-effect-slide-shadows="true" 
+                autoplay-delay="3500"
+                autoplay-disable-on-interaction="false"
+                pagination="true"
+                pagination-clickable="true"
+                style="padding: 30px 0 50px;">
+                
+                <!-- Slide 1 - Research -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group transition-all duration-500">
+                    <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Research Lab"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5 transition-all duration-300 group-hover:pb-7">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-microscope text-[10px]"></i> Research & Innovation</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">Future Labs: Breakthroughs</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Students pushing boundaries in biotech and sustainable energy.</p>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="w-[280px] h-[340px] sm:w-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                    <img src="https://cdn.corenexis.com/files/c/6885556720.jpg" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Campus Life 2"/>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-                        <span class="text-white font-bold font-outfit text-lg">🎨 Arts & Creative Spaces</span>
+                
+                <!-- Slide 2 - Student Success -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Student Success"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-trophy"></i> Achievement</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">From Classroom to CEO</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">How undergrads built a million-dollar venture before graduation.</p>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="w-[280px] h-[340px] sm:w-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                    <img src="https://cdn.corenexis.com/files/c/8982667720.jpg" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Campus Life 3"/>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-                        <span class="text-white font-bold font-outfit text-lg">💻 Programming Hackathons</span>
+                
+                <!-- Slide 3 - Arts & Culture -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Arts Festival"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-palette"></i> Arts & Culture</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">Colors of Unity Fest</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Vibrant celebration of music, dance, and creative expression.</p>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="w-[280px] h-[340px] sm:w-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                    <img src="https://cdn.corenexis.com/files/c/6176255720.jpg" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Campus Life 4"/>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-                        <span class="text-white font-bold font-outfit text-lg">✈️ Global Student Exchange</span>
+                
+                <!-- Slide 4 - Hackathon -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Hackathon"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">48H AI for Social Good</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Innovative ML solutions solving real-world problems.</p>
+                        <div class="flex items-center gap-3 text-white/70 text-xs"><span><i class="fa-regular fa-clock mr-1"></i>6 min read</span><span><i class="fa-regular fa-heart mr-1"></i>2.9k</span></div>
                     </div>
                 </swiper-slide>
-                <swiper-slide class="w-[280px] h-[340px] sm:w-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                    <img src="https://cdn.corenexis.com/files/c/2663364720.jpg" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Campus Life 5"/>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-                        <span class="text-white font-bold font-outfit text-lg">⛰️ Travel & Outdoor Clubs</span>
+                
+                <!-- Slide 5 - Academics -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Library"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-graduation-cap"></i> Academic Excellence</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">Rhodes Scholars 2026</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Meet the brilliant minds shaping the future through research.</p>
+                    </div>
+                </swiper-slide>
+                
+                <!-- Slide 6 - Global Exchange -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://images.unsplash.com/photo-1523800503107-5bc3ba2a6f81?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Study Abroad"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-globe"></i> Global Exchange</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">Semester in Kyoto</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Immersive cultural experiences beyond borders.</p>
+                    </div>
+                </swiper-slide>
+                
+                <!-- Slide 7 - Graduation -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://cdn.corenexis.com/files/c/2446388720.png" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Graduation"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-calendar-check"></i> Ceremony</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">Class of 2026</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Celebrating milestones, memories, and the future.</p>
+                    </div>
+                </swiper-slide>
+                
+                <!-- Slide 8 - Sports -->
+                <swiper-slide class="w-[280px] h-[380px] sm:w-[340px] sm:h-[420px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                    <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Sports"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold w-fit mb-3"><i class="fa-solid fa-futbol"></i> Athletics</span>
+                        <h3 class="text-white text-xl font-bold font-outfit leading-tight mb-1">Champions League Finals</h3>
+                        <p class="text-white/80 text-sm line-clamp-2 mb-2">Epic matches, team spirit, and the road to nationals.</p>
                     </div>
                 </swiper-slide>
             </swiper-container>
         </div>
     </div>
-    {% endblock %}
+</div>
+
+<!-- Swiper Initialization with Navigation & Autoplay Hover Pause -->
+<script>
+    (function() {
+        const swiperEl = document.querySelector('.campus-swiper');
+        if (!swiperEl) return;
+
+        // Initialize Swiper
+        swiperEl.initialize();
+
+        // Connect custom navigation buttons
+        const prevBtn = document.querySelector('.swiper-nav-prev');
+        const nextBtn = document.querySelector('.swiper-nav-next');
+        if (prevBtn && nextBtn && swiperEl.swiper) {
+            prevBtn.addEventListener('click', () => swiperEl.swiper.slidePrev());
+            nextBtn.addEventListener('click', () => swiperEl.swiper.slideNext());
+        }
+
+        // Pause autoplay on hover
+        swiperEl.addEventListener('mouseenter', () => {
+            if (swiperEl.swiper && swiperEl.swiper.autoplay) swiperEl.swiper.autoplay.stop();
+        });
+        swiperEl.addEventListener('mouseleave', () => {
+            if (swiperEl.swiper && swiperEl.swiper.autoplay) swiperEl.swiper.autoplay.start();
+        });
+    })();
+</script>
+
+<!-- Add fade-in animation if not already present in your global CSS -->
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
 
     <!-- Main Content Area -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -238,7 +517,6 @@
         var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        // Change the icons inside the button based on previous settings
         if (localStorage.getItem('color-theme') === 'dark') {
             themeToggleLightIcon.classList.remove('hidden');
         } else {
@@ -248,11 +526,9 @@
         var themeToggleBtn = document.getElementById('theme-toggle');
 
         themeToggleBtn.addEventListener('click', function() {
-            // Toggle icons inside button
             themeToggleDarkIcon.classList.toggle('hidden');
             themeToggleLightIcon.classList.toggle('hidden');
 
-            // If set in localStorage
             if (localStorage.getItem('color-theme')) {
                 if (localStorage.getItem('color-theme') === 'light') {
                     document.documentElement.classList.add('dark');
@@ -261,7 +537,6 @@
                     document.documentElement.classList.remove('dark');
                     localStorage.setItem('color-theme', 'light');
                 }
-            // If not set in localStorage
             } else {
                 if (document.documentElement.classList.contains('dark')) {
                     document.documentElement.classList.remove('dark');
@@ -273,7 +548,6 @@
             }
         });
 
-        // Profile Dropdown Toggle Script
         var profileMenuBtn = document.getElementById('profile-menu-button');
         var profileDropdown = document.getElementById('profile-dropdown-menu');
         var profileDropdownIcon = document.getElementById('profile-dropdown-icon');
@@ -296,7 +570,6 @@
                 }
             });
 
-            // Close dropdown when clicking outside
             document.addEventListener('click', function(event) {
                 if (profileMenuBtn.getAttribute('aria-expanded') === 'true' && !event.target.closest('#profile-dropdown-container')) {
                     profileDropdown.classList.remove('scale-100', 'opacity-100', 'visible');
